@@ -1,0 +1,68 @@
+ack                    # 优化程序员使用的类似grep的工具
+antlr3                 # ANTLR（另一个语言识别工具），版本3
+asciidoc               # 用于撰写文档的文本文档格式
+autoconf               # 自动配置源代码的工具
+automake               # 自动生成Makefile.in文件的工具
+autopoint              # 用于国际化各种类型数据文件的工具
+binutils               # 一组二进制工具
+bison                  # 类似yacc的解析器生成器
+build-essential        # Debian软件包构建所必需的基本包
+bzip2                  # 文件压缩工具
+ccache                 # 用于加快重建速度的编译器缓存
+cmake                  # 跨平台构建系统
+cpio                   # 创建和提取归档的工具
+curl                   # 命令行工具，用于通过URL传输数据
+device-tree-compiler   # 用于操作设备树源文件的工具
+fastjar                # 快速的Java存档（JAR）工具实现
+flex                   # 快速词法分析器生成器
+gawk                   # GNU版AWK
+gettext                # 国际化和本地化软件的工具集
+gcc-multilib           # 多架构GNU编译器集合
+g++-multilib           # 多架构GNU C++编译器集合
+git                    # 分布式版本控制系统
+gperf                  # 完美哈希函数生成器
+haveged                # 使用HAVEGE算法的熵源
+help2man               # 自动生成简单手册页的工具
+intltool               # 用于翻译XML文件的实用工具
+libc6-dev-i386         # i386开发的GNU C库头文件
+libelf-dev             # ELF对象文件访问库的开发文件
+libfuse-dev
+libglib2.0-dev         # GLib库的开发文件
+libgmp3-dev            # GNU MP库的开发文件
+libltdl-dev            # libtool库的开发文件
+libmpc-dev             # MPC库的开发文件
+libmpfr-dev            # MPFR库的开发文件
+libncurses5-dev        # ncurses库的开发文件
+libncursesw5-dev       # ncursesw库的开发文件
+libpython3-dev         # Python（v3.2）的头文件和静态库
+libreadline-dev        # GNU readline和history库的开发文件
+libssl-dev             # SSL开发库、头文件和文档
+libtool                # 通用库支持脚本
+lrzsz                  # zmodem文件传输工具集
+mkisofs                # 创建ISO-9660 CD-ROM文件系统映像
+msmtp                  # SMTP客户端
+ninja-build            # 专注于速度的小型构建系统
+p7zip                  # 高压缩比的7z文件归档工具
+p7zip-full             # 完整版本的高压缩比7z文件归档工具
+patch                  # 将差异文件应用到原始文件的工具
+pkgconf                # 包编译器和链接器元数据工具包
+python2.7              # 交互式高级面向对象语言（版本2.7）
+python3                # 交互式高级面向对象语言（版本3）
+python3-pyelftools     # 分析ELF文件的Python库
+python3-setuptools     # Python3 Distutils增强工具
+qemu-utils             # QEMU实用工具
+rsync                  # 快速远程文件和目录同步工具
+scons                  # 构建系统
+squashfs-tools         # 创建和追加到squashfs文件系统的工具
+subversion             # 高级版本控制系统
+swig                   # 生成C/C++代码的脚本接口
+texinfo                # 用于在线信息和打印输出的文档系统
+uglifyjs               # JavaScript解析器/压缩器/美化器
+upx-ucl                # 压缩和解压可执行文件
+unzip                  # .zip文件解压工具
+vim                    # 改进版的vi编辑器
+wget                   # 从Web检索文件的工具
+xmlto                  # XML到任何格式的转换器
+xxd                    # 创建十六进制格式文件的实用工具
+zlib1g-dev             # 压缩库-开发包
+nano                   # 小型、友好的文本编辑器

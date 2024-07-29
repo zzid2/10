@@ -1,0 +1,37 @@
+git clone https://github.com/openwrt-dev/po2lmo.git                  # 下载po2lmo依赖
+pushd po2lmo
+make && sudo make install
+popd
+
+
+
+if [ ${{matrix.target}} != "openwrt" ]; then                       # 当编译“openwrt”纯净机型时，下载openwrt-package插件包
+	git clone -b $REPO_BRANCH --single-branch https://github.com/281677160/openwrt-package package/danshui
+fi
+
+
+
+https://github.com/unifreq/openwrt_packit    # N1打包源码，未测试   https://github.com/wxfyes/N1packaging/releases
+
+
+- name: 升级 Go版本
+ run: |
+ cd openwrt && rm -rf feeds/packages/lang/golang
+ git clone https://github.com/sbwml/packages_lang_golang -b 22.x feeds/packages/lang/golang
+
+
+
+- name: Apply patches #patch补丁
+ run: |
+ cd openwrt
+ find "devices/common/patches" -type f ! -path 'devices/common/patches/china_mirrors.patch' -name '*.patch' -print0 | sort -z | xargs -I % -t -0 -n 1 sh -c "cat '%'  | patch -d './' -p1 -E --forward --no-backup-if-mismatch"
+
+
+
+修复mt76无线驱动程序
+ pushd package/kernel/mt76
+ sed -i '/mt7662u_rom_patch.bin/a\\techo mt76-usb disable_usb_sg=1 > $\(1\)\/etc\/modules.d\/mt76-usb' Makefile
+ popd
+
+
+        

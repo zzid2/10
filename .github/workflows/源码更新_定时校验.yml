@@ -1,0 +1,158 @@
+#
+# Copyright (c) 2019-2021 P3TERX <https://p3terx.com>
+#
+# This is free software, licensed under the MIT License.
+# See /LICENSE for more information.
+#
+# https://github.com/P3TERX/Actions-OpenWrt
+# File: .github/workflows/update-checker.yml
+# Description: Source code update checker
+#
+
+name: 定时启动_校验源码                 ## Update Checker
+on:
+  workflow_dispatch:
+  
+  schedule:                                                               ## 定时触发开始编译(时间设置请看定时编译说明)
+    - cron: 30 8 * * *                  ## 每天早上8.30执行
+    
+env:
+  REPO_URL_LEDE: https://github.com/coolsnowwolf/lede                     ## lede 源码仓库
+  REPO_URL_SSRPLUS: https://github.com/fw876/helloworld                   ## SSR-Plus 源码
+  REPO_URL_PASSWALL: https://github.com/xiaorouji/openwrt-passwall        ## Passwall 源码
+  REPO_URL_luci_app: https://github.com/zzid2/luci-app                    ## 自己整理仓库
+  
+  REPO_MASTER: master                                                     ## master 分支
+  REPO_MAIN: main                                                         ## main   分支
+  
+  
+  
+jobs:
+#---------------------------------------------------------------------------------------------------------------------------
+  lede:                                 ## 监视lede源码
+    runs-on: ubuntu-latest
+
+    steps:
+
+    - name: 提交哈希比对值              ## Get Commit Hash
+      id: getHash
+      run: |
+        git clone --depth 1 $REPO_URL_LEDE -b $REPO_MASTER .              ## 克隆下载Lede源码
+        echo "commitHash=$(git rev-parse HEAD)" >> $GITHUB_OUTPUT         ## commitHash 文件值输出到GitHub变量
+    - name: 比较哈希比对值              ## Compare Commit Hash
+      id: cacheHash
+      uses: actions/cache@v4
+      with:
+        path: .commitHash                                                 ## 提交 commitHash 哈希值文件，进行比较。
+        key: HEAD-${{ steps.getHash.outputs.commitHash }}
+
+    - name: 保存新的哈希比较值          ## Save New Commit Hash
+      if: steps.cacheHash.outputs.cache-hit != 'true'
+      run: |
+        echo ${{ steps.getHash.outputs.commitHash }} | tee .commitHash    ## 保存最新的哈希值文件 
+
+    - name: 触发编译                    ## Trigger build
+      if: steps.cacheHash.outputs.cache-hit != 'true'
+      uses: peter-evans/repository-dispatch@v3
+      with:
+        token: ${{ secrets.REPO_TOKEN }}
+        repository: ${{ github.repository }}
+        event-type: lede源码更新_触发编译                                 ## 触发编译后，显示的 工作流的称 Source Code Update
+#---------------------------------------------------------------------------------------------------------------------------
+  ssrplus:                              ## 监视SSR-Plus源码
+    runs-on: ubuntu-latest
+
+    steps:
+
+    - name: 提交哈希比对值
+      id: getHash
+      run: |
+        git clone --depth 1 $REPO_URL_SSRPLUS -b $REPO_MASTER .
+        echo "commitHash=$(git rev-parse HEAD)" >> $GITHUB_OUTPUT
+    - name: 比较哈希比对值
+      id: cacheHash
+      uses: actions/cache@v4
+      with:
+        path: .commitHash
+        key: HEAD-${{ steps.getHash.outputs.commitHash }}
+
+    - name: 保存新的哈希比较值
+      if: steps.cacheHash.outputs.cache-hit != 'true'
+      run: |
+        echo ${{ steps.getHash.outputs.commitHash }} | tee .commitHash
+
+    - name: 触发编译
+      if: steps.cacheHash.outputs.cache-hit != 'true'
+      uses: peter-evans/repository-dispatch@v3
+      with:
+        token: ${{ secrets.REPO_TOKEN }}
+        repository: ${{ github.repository }}
+        event-type: SSR-Plus源码更新_触发编译                             ## 触发编译后，显示的 工作流的称 Source Code Update
+#---------------------------------------------------------------------------------------------------------------------------
+  passwall:                             ## 监视Passwall源码
+    runs-on: ubuntu-latest
+
+    steps:
+
+    - name: 提交哈希比对值
+      id: getHash
+      run: |
+        git clone --depth 1 $REPO_URL_PASSWALL -b $REPO_MAIN .
+        echo "commitHash=$(git rev-parse HEAD)" >> $GITHUB_OUTPUT
+    - name: 比较哈希比对值
+      id: cacheHash
+      uses: actions/cache@v4
+      with:
+        path: .commitHash
+        key: HEAD-${{ steps.getHash.outputs.commitHash }}
+
+    - name: 保存新的哈希比较值
+      if: steps.cacheHash.outputs.cache-hit != 'true'
+      run: |
+        echo ${{ steps.getHash.outputs.commitHash }} | tee .commitHash
+
+    - name: 触发编译
+      if: steps.cacheHash.outputs.cache-hit != 'true'
+      uses: peter-evans/repository-dispatch@v3
+      with:
+        token: ${{ secrets.REPO_TOKEN }}
+        repository: ${{ github.repository }}
+        event-type: Passwall源码更新_触发编译                             ## 触发编译后，显示的 工作流的称 Source Code Update
+#---------------------------------------------------------------------------------------------------------------------------
+  luci-app:                             ## 监视luci-app源码
+    runs-on: ubuntu-latest
+
+    steps:
+
+    - name: 提交哈希比对值
+      id: getHash
+      run: |
+        git clone --depth 1 $REPO_URL_luci_app -b $REPO_MAIN .
+        echo "commitHash=$(git rev-parse HEAD)" >> $GITHUB_OUTPUT
+    - name: 比较哈希比对值
+      id: cacheHash
+      uses: actions/cache@v4
+      with:
+        path: .commitHash
+        key: HEAD-${{ steps.getHash.outputs.commitHash }}
+
+    - name: 保存新的哈希比较值
+      if: steps.cacheHash.outputs.cache-hit != 'true'
+      run: |
+        echo ${{ steps.getHash.outputs.commitHash }} | tee .commitHash
+
+    - name: 触发编译
+      if: steps.cacheHash.outputs.cache-hit != 'true'
+      uses: peter-evans/repository-dispatch@v3
+      with:
+        token: ${{ secrets.REPO_TOKEN }}
+        repository: ${{ github.repository }}
+        event-type: luci-app源码更新_触发编译                             ## 触发编译后，显示的 工作流的称 Source Code Update
+#---------------------------------------------------------------------------------------------------------------------------
+    - name: 删除工作流运行
+      uses: Mattraks/delete-workflow-runs@main
+      with:
+        token: ${{ secrets.REPO_TOKEN }}
+        repository: ${{ github.repository }}
+        retain_days: 1                  ## 保留天数      （默认值：1）
+        keep_minimum_runs: 10           ## 保存最少运行数（默认值：3）

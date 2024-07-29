@@ -1,0 +1,819 @@
+#
+# https://github.com/P3TERX/Actions-OpenWrt
+#
+# File: .github/workflows/openwrt-bulder.yml
+# Description: Build OpenWrt using GitHub Actions
+#
+# Copyright (c) 2019-2024 P3TERX <https://p3terx.com>
+#
+# This is free software, licensed under the MIT License.
+# See /LICENSE for more information.
+#
+
+name: 编译OpenWrt                  ## Actions工作流的名称  GItHub搜索：OpenWrt-CI
+on:
+  # repository_dispatch:             ## “源码更新_定时校验” 的工作流有更新时 触发此编译工作流。
+  workflow_dispatch:               ## 手动触发工作流程_调度
+    inputs:
+      ssh:                         ## 做判断时用的ID名称（可更改）  
+        description: 'SSH远程'     ## 工作流_菜单提示框的名称
+        required: false
+        default: 'true-false'       ## 输入：true=开启 false=关闭
+      wxtz:
+        description: '微信通知'
+        required: false
+        default: 'wxtz'            ## 输入：wxtz=开启 false=关闭
+      release:
+        description: '发布固件'
+        required: false
+        default: 'release'         ## 输入：release=开启 actions=关闭
+        
+  
+  ## 对齐
+  # schedule:                        ## 定时触发开始编译(时间设置请看定时编译说明)
+    # - cron: 30 8 */5 * *           ## 每间隔5天，在早上8.30执行
+  
+  
+  ## 对齐
+  # watch:                           ## 点☆Star触发开始编译
+    # types: started
+
+  ## 对齐
+  push:                             ## 当代码推送到指定分支时      触发编译
+    branches:
+      - main                        ## 确保只在 main 分支有改动时，触发编译
+    paths:
+      - '.github/workflows/编译_openwrt.yml'               ## 只在这个文件有变化时 触发编译
+      
+      
+  ## 对齐
+  # release:                         ## release发布触发开始编译(只是一个触发条件,不会发布的,又麻烦,没卵用,不用研究)
+    # types: published
+
+
+
+#-----------------------------------------------------------------------------------------------------------------
+# # 单机型_各项配置开关
+  # FIRMWARE_NAME: OpenWRT_x86                                       ## 微信推送变量名（固件名称不能含中文）
+  # GITHUB_RELEASE: https://github.com/zuoweiid/10/releases          ## GitHub发布地址，修改成自己的
+  # REPO_URL: https://github.com/coolsnowwolf/lede                   ## OpenWRT源码地址
+  # REPO_BRANCH: master             ## ←源码分支
+  # FEEDS_CONF: feeds.conf.default  ## 自定义feeds文件
+  # CONFIG_FILE: .config            ## 自定义config配置       多机型配置文件如：(config/N1.config)
+  # DIY_P1_SH: diy-part1.sh         ## 自定义脚本             多机型脚本文件如：(scripts/diy-part1.sh)
+  # DIY_P2_SH: diy-part2.sh         ## 自定义脚本             多机型脚本文件如：(scripts/diy-part2.sh)
+  #  ORGANIZE_FIRMWARE: false       ## 整理固件清除packages
+  # UPLOAD_CONFIG: true             ## ←上传config配置文件
+  # UPLOAD_FIRMWARE: true           ## ←上传固件到gitthub空间（默认必选true）
+  # UPLOAD_BIN_DIR: true            ## ←上传bin文件夹到_github空间（固件+ipk）
+  # UPLOAD_RELEASE: true            ## ←发布固件到_/releases主页
+  # UPLOAD_COWTRANSFER: true        ## ←上传到_奶牛快传
+  # UPLOAD_WETRANSFER: true         ## ←上传到_WeTransfer
+  # EXTRACT_LINKS: true             ## 提取奶牛快传和WeTransfer链接
+  # TZ: Asia/Shanghai               ## ←时区设置
+  # REPO_TOKEN: ${{ secrets.REPO_TOKEN }}   ## GitHub令牌名称（用于发布固件）
+  # SCKEY: ${{ secrets.SCKEY }}             ## ServerChan微信推送
+#-----------------------------------------------------------------------------------------------------------------
+
+
+
+env:
+  Author: ${{github.actor}}                              ## Github用户ID，如：zuoweiid
+  Run_number: ${{github.run_number}}                     ## 当前运行工作流编号，如#12
+  GITURL: https://github.com/${{github.repository}}      ## 当前项目仓库ID = https://github.com +（用户ID + 项目仓库名字），结果：https://github.com/zuoweiid/10    ${{github.repository}}=当前仓库
+  REPO_TOKEN: ${{ secrets.REPO_TOKEN }}  ## REPO_TOKEN === GitHub令牌密钥（用于发布固件）
+  SCKEY: ${{ secrets.SCKEY }}            ## SCKEY      === 推送ID密钥    （用于微信推送）
+  TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}      ## TELEGRAM_CHAT_ID   === TG电报群令牌
+  TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}  ## TELEGRAM_BOT_TOKEN === TG电报群密钥
+  TZ: Asia/Shanghai                                      ## 时区设置为上海
+
+
+
+jobs:
+  build:                                  ## 运行脚本的备注名称（可更改）
+    runs-on: Ubuntu-20.04                 ## ←选择编译系统版本
+    if: github.event.repository.owner.id == github.event.sender.id   ## 只有仓库所有者才能使用  “点 Star启动编译”
+    
+    
+    name: 编译 ${{matrix.target}}         ## 多机型同时编译；“编译” 后面是选择编译的机型名称；如：“lede_x86”
+    strategy:
+      fail-fast: false
+      matrix:
+        target: [lede_G-DOCK,lede_N1,lede_x86]                ## ←编译指定机型 “就是文件夹名称”，多选用英文逗号隔开可以同时编译；
+        # 目前可以选机型：openwrt,lede_G-DOCK,lede_hiwifi_HC5861,lede_linksys_Wrt32x,lede_N1,lede_x86
+
+    
+    steps:
+    
+    - name: 准备环境                      ## Checkout
+      uses: actions/checkout@v4           ## 加载执行仓库：https://github.com/actions/checkout
+      # uses: actions/setup-node@v4         ## 加载执行仓库，用于指定Node.js版本
+      # with:
+        # node-version: 20.x                ## 指定Node.js版本为：20.x
+    
+    
+    
+#-----------------------------------------------------------------------------------------------------------------
+# 单机型_配置脚本 “settings.ini”
+#REPO_URL="https://github.com/project-openwrt/openwrt"     #编译固件源码链接（请勿修改）
+#REPO_BRANCH="openwrt-18.06"         #源码链接的分支（请勿修改）
+#CONFIG_FILE=".config"               #配置文件（可SSH远程定制固件插件，也可在本地提取配置粘贴到此文件）
+#WXFB_MESSAGE="project_x86_64"       #微信通知跟发布要用到的名字,比如通知你XX开始编译,发布的时候显示XX固件
+#DIY_P1_SH="diy-1.sh"                #自定义文件1
+#DIY_P2_SH="diy-2.sh"                #自定义文件2
+#SSH_ACTIONS="false"                 #SSH远程配置固件（true=开启）（false=关闭）
+#UPLOAD_BIN_DIR="false"              #上传【bin文件夹】到github空间（true=开启）（false=关闭）
+#UPLOAD_CONFIG="true"                #上传【.config】配置文件到github空间（true=开启）（false=关闭）
+#UPLOAD_FIRMWARE="true"              #上传固件到github空间（true=开启）（false=关闭）
+#UPLOAD_COWTRANSFER="true"           #上传固件到【奶牛快传】（true=开启）（false=关闭）
+#UPLOAD_WETRANSFER="true"            #上传固件到【WETRANSFER】（true=开启）（false=关闭）
+#UPLOAD_RELEASE="false"              #发布固件（true=开启）（false=关闭）
+#SERVERCHAN_SCKEY="false"            #微信通知（true=开启）（false=关闭）
+#-----------------------------------------------------------------------------------------------------------------
+
+
+
+    - name: 加载settings.ini配置变量      ## 编译前加载 /build/机型文件夹/settings.ini
+      run: |
+        pwd && ls                                                                        # 显示当前步骤的路径和所有文件和文件夹；
+        df -hT $PWD                                                                      # 显示当前磁盘使用情况
+        
+        ## 加载settings.ini配置文件
+        if [ -f "${GITHUB_WORKSPACE}/build/${{matrix.target}}/settings.ini" ]; then      # 判断 如果机型目录内没有 settings.ini 文件, 移动DIY目录内的文件 并加载它。
+            echo "注意: 使用机型目录内的 settings.ini 文件"
+        else
+            echo "注意: 移动"settings.ini"文件；DIY目录下 移至机型目录内"
+            mv ${GITHUB_WORKSPACE}/build/DIY/settings.ini ${GITHUB_WORKSPACE}/build/${{matrix.target}}
+        fi
+        source "${GITHUB_WORKSPACE}/build/${{matrix.target}}/settings.ini"
+        
+        ## settings.ini配置变量
+        echo "REPO_URL=${REPO_URL}" >> $GITHUB_ENV                                       # = 源码地址
+        echo "REPO_BRANCH=${REPO_BRANCH}" >> $GITHUB_ENV                                 # = 项目分支
+        echo "CONFIG_FILE=${CONFIG_FILE}" >> $GITHUB_ENV                                 # = .config配置文件
+        echo "DIY_P1_SH=${DIY_P1_SH}" >> $GITHUB_ENV                                     # = DIY_P1_SH的变量
+        echo "DIY_P2_SH=${DIY_P2_SH}" >> $GITHUB_ENV                                     # = DIY_P2_SH的变量
+        echo "DIY_OEM_SH=${DIY_OEM_SH}" >> $GITHUB_ENV                                   # = DIY_OEM_SH的变量
+        echo "SSH_ACTIONS=${SSH_ACTIONS}" >> $GITHUB_ENV                                 # = 开关 SSH远程连接
+        echo "UPLOAD_BIN_DIR=${UPLOAD_BIN_DIR}" >> $GITHUB_ENV                           # = 开关 上传Bin目录至github空间的变量
+        echo "UPLOAD_CONFIG=${UPLOAD_CONFIG}" >> $GITHUB_ENV                             # = 开关 将“.config配置文件” 上传到github空间的变量
+        echo "UPLOAD_FIRMWARE=${UPLOAD_FIRMWARE}" >> $GITHUB_ENV                         # = 开关 将“编译好的固件”    上传到github空间的变量
+        echo "UPLOAD_COWTRANSFER=${UPLOAD_COWTRANSFER}" >> $GITHUB_ENV                   # = 开关 将“编译好的固件”    上传到奶牛快传的变量
+        echo "UPLOAD_WETRANSFER=${UPLOAD_WETRANSFER}" >> $GITHUB_ENV                     # = 开关 将“编译好的固件”    上传到“WETRANSFER网盘”的变量
+        echo "UPLOAD_RELEASE=${UPLOAD_RELEASE}" >> $GITHUB_ENV                           # = 开关 将“编译好的固件” 发布到仓库中
+        echo "SERVERCHAN_SCKEY=${SERVERCHAN_SCKEY}" >> $GITHUB_ENV                       # = 开关 微信通知的变量
+        
+        ## 时间的变量
+        echo "CangKu=${GITURL##*${Author}/}" >> $GITHUB_ENV                              # = 项目仓库名称的变量
+        echo "date=$(date "+%Y.%m.%d-%H%M")" >> $GITHUB_ENV                              # = date 变量时间格式: 2021.01.02-1310   上传至github空间的格式，发布固件到 左侧标签的格式，（Tags左侧标签时间格式）
+        echo "date1=$(date "+%Y年%m月%d号-%H点%M分")" >> $GITHUB_ENV                    # = date1 变量时间格式: 2021年01月02号-13点10分 （Releases主页发布固件名称）
+        echo "$(date +%s)" > start_time.txt                                              ## 启动时间 写入到“start_time.txt”文本中（与结尾“end_time.txt”文本对应）
+        
+        ## 源码的变量
+        if [ $REPO_URL == "https://github.com/coolsnowwolf/lede" ]; then                 # 当使用Lede源码时      变量：NAME2=Lede   ZUOZHE=lean
+         echo "NAME2=Lede_" >> $GITHUB_ENV
+         echo "ZUOZHE=lean" >> $GITHUB_ENV
+        elif [ $REPO_URL == "https://github.com/Lienol/openwrt" ]; then                  # 当使用Lienol源码时    变量：NAME2=Lienol   ZUOZHE=lienol
+         echo "NAME2=Lienol_" >> $GITHUB_ENV
+         echo "ZUOZHE=lienol" >> $GITHUB_ENV
+        elif [ $REPO_URL == "https://github.com/project-openwrt/openwrt" ]; then         # 当使用Project源码时   变量：NAME2=Project   ZUOZHE=CTCGFW
+         echo "NAME2=Project_" >> $GITHUB_ENV
+         echo "ZUOZHE=CTCGFW" >> $GITHUB_ENV
+        elif [ $REPO_URL == "https://github.com/openwrt/openwrt" ]; then                 # 当使用官方源码时      变量：NAME2=Official
+         echo "NAME2=Official_" >> $GITHUB_ENV
+        fi
+        
+        ## 终端添加中文
+        sudo apt-get install -y language-pack-zh-hans                                    # 安装中文语言包
+        echo "LANG=zh_CN.UTF-8" >> $GITHUB_ENV                                           # 加入中文语言包 的变量，会持续显示中文语言；
+        
+        
+
+## https://github.com/josStorer/get-current-time            获取当前时间
+## https://github.com/marketplace/actions/pushplus-action
+## https://github.com/xhnmt/pushplus-action
+
+
+
+    # - name: 准备编译_微信通知             ## Github设置里需添微信SCKEY
+      # uses: emon100/Action-Serverchan@v2  ## 加载执行仓库：https://github.com/emon100/Action-Serverchan
+      # if: env.SERVERCHAN_SCKEY == 'true' || (github.event.inputs.wxtz == 'wxtz' && github.event.inputs.wxtz  != 'false')
+      # with:
+        # SCKEY: ${{ secrets.SCKEY }}
+        # text: 注意：${{env.CangKu}}仓库的#${{env.Run_number}}号[${{matrix.target}}]开始编译啦！
+        # desp: 主人您要编译的[${{matrix.target}}]固件正在努力耕耘中,请耐心等待......
+              
+              
+              # 仓库名称：${{env.CangKu}}
+              
+              
+              # 工作流号：#${{env.Run_number}}
+              
+              
+              # 固件名称：${{matrix.target}}
+              
+            
+            
+    - name: 安装编译环境                ## Initialization environment
+      env:
+        DEBIAN_FRONTEND: noninteractive      ## 非交互模式
+      run: |
+        sudo rm -rf /etc/apt/sources.list.d/* /usr/share/dotnet /usr/local/lib/android /opt/ghc                                                       ## 删除：sources.list.d 目录、dotnet 目录、android目录、ghc目录。
+        sudo -E apt-get -qq update -y && sudo -E apt-get -qq upgrade -y && sudo -E apt-get -qq autoremove -y --purge && sudo -E apt-get -qq clean     ## 更新软件包引、安装软件包、删除无用软件包、清理 APT 缓存。
+        sudo timedatectl set-timezone "$TZ"            ## 设置时区为上海
+        sudo mkdir -p /workdir                         ## 在根目录下 新创建“workdir”目录，用于备份 openwrt 源码；
+        sudo chown $USER:$GROUPS /workdir              ## 提高“workdir”目录的权限
+        
+        if [ -f "build/DIY/env" ];then                 ## 安装环境文件env（自动去除"注释"信息）
+            echo "注意: 使用"build/DIY/env"依赖文件"
+            sudo -E apt-get -qq install -y $(awk '{print $1}' build/DIY/env)
+        else
+            echo "错误: 未找到"env"依赖文件"
+        fi
+        
+        sudo -E apt-get -qq install -y xz-utils btrfs-progs zip dosfstools uuid-runtime pigz             ## N1固件打包必需要的依赖
+        
+        
+        
+    - name: 释放 Ubuntu 磁盘空间        ## Free Disk Space (Ubuntu) （预计释放31GB空间）
+      uses: jlumbroso/free-disk-space@main             ## 加载执行仓库：https://github.com/jlumbroso/free-disk-space
+      with:
+        tool-cache: true
+        android: true
+        dotnet: true
+        haskell: true
+        large-packages: true
+        swap-storage: true
+        
+        
+        
+    - name: 下载${{matrix.target}}源码                 ## Clone source code
+      working-directory: /workdir                      ## 指定 执行工作目录为新创建的“workdir”目录，Lede源码也存放在此下 /workdir/openwrt
+      run: |
+        git clone -b $REPO_BRANCH $REPO_URL openwrt                   # 克隆完整仓库的分支和历史记录（本地编译不推荐），文件夹命名为：“openwrt”
+        ln -sf /workdir/openwrt $GITHUB_WORKSPACE/openwrt             # 下载源码目录 /workdir/openwrt 强制建立软连接到 主仓库目录下 home/runner/work/仓库名称/仓库名称/openwrt 目录；
+        
+        cd openwrt                                                                      # 首次进入”软连接“源码 的执行目录“openwrt”
+        
+        if [ ${{matrix.target}} != openwrt ]; then                    # 当编译“openwrt”纯净机型时，先删除这些文件夹
+          rm -rf package/lienol/luci-app-timecontrol
+          rm -rf package/ntlf9t/{smartdns,luci-app-smartdns}
+          rm -rf package/ctcgfw/{luci-app-argon-config,luci-theme-argonv3}
+          rm -rf package/lean/{luci-app-netdata,luci-theme-argon,k3screenctrl}
+        fi
+        
+        rm -rf {LICENSE,README,README.md}
+        rm -rf ./*/{LICENSE,README,README.md}
+        rm -rf ./*/*/{LICENSE,README,README.md}    # 删除无用说明
+        
+        
+        
+    - name: 清理缓存                           ## Cache                                    ## 清理缓存
+      uses: klever1988/cachewrtbuild@main            ## 加载执行仓库：https://github.com/stupidloud/cachewrtbuild
+      with:
+          ccache: 'true'
+          mixkey: 'x86'
+          prefix: 'openwrt'
+          
+          
+          
+    - name: 加载DIY_1脚本                              ## Load custom feeds
+      run: |
+        cp -Rf `find ./ -maxdepth 1 -type d ! -path './openwrt' ! -path './'` openwrt               # 只复制当前 build “目录内的所有文件 至 openwrt目录下（-R 不复制目录） ，
+        
+        cd openwrt                                                                                  # 后续执行命令默认进入：“openwrt”源码目录
+        
+        if [ -f "build/${{matrix.target}}/$DIY_P1_SH" ]; then                                       # 判断 如果机型目录内没有 diy-part1 脚本, 复制DIY目录内的脚本并 运行它。
+          echo "注意: 使用机型目录内的 diy-part1 脚本"
+        else
+          echo "注意: 移动DIY目录下的 diy-part1 脚本至机型目录内"
+          mv build/DIY/$DIY_P1_SH build/${{matrix.target}}
+        fi
+        chmod +x build/${{matrix.target}}/$DIY_P1_SH
+        /bin/bash "build/${{matrix.target}}/$DIY_P1_SH"
+        
+        
+        
+    - name: 加载DIY_2脚本                    ## Load custom configuration
+      run: |
+        cd openwrt                           # 进入“openwrt”源码目录
+        
+        if [ -f "build/${{matrix.target}}/$DIY_P2_SH" ]; then                                       # 判断 如果机型目录内没有 diy-part2 脚本, 复制DIY目录内的脚本并 运行它。
+          echo "注意: 使用机型目录内的 diy-part2 脚本"
+        else
+          echo "注意: 移动 diy-part2 脚本,DIY目录 移至机型目录内"
+          mv build/DIY/$DIY_P2_SH build/${{matrix.target}}
+        fi
+        chmod +x build/${{matrix.target}}/$DIY_P2_SH
+        /bin/bash "build/${{matrix.target}}/$DIY_P2_SH"
+        
+        
+        if [ -f "build/${{matrix.target}}/$DIY_OEM_SH" ]; then                                      # 个性化配置OEM
+            chmod +x build/${{matrix.target}}/$DIY_OEM_SH
+            /bin/bash "build/${{matrix.target}}/$DIY_OEM_SH"
+        fi
+            
+            
+        if [ -n "$(ls -A "build/${{matrix.target}}/diy" 2>/dev/null)" ]; then                       # 判断diy目录  优先复制机型目录内的diy目录，如果没有 再复制 build/DIY/diy 文件目录至 openwrt 源码内。 
+            echo "注意: 复制 diy目录 "
+            cp -rf build/${{matrix.target}}/diy/* ./
+        else
+            if [ -d "build/DIY/diy" ]; then
+                cp -rf build/DIY/diy/* ./
+            else
+                echo "错误: diy目录不存在"
+            fi
+        fi
+            
+            
+        if [ -n "$(ls -A "build/${{matrix.target}}/files" 2>/dev/null)" ]; then                     # 判断 openwrt/files目录  （-n 表示如果有非空字符文件（就是有文件字符），则执行 then 后面的命令）
+            echo "注意: 复制 files目录 "
+            cp -rf build/${{matrix.target}}/files files
+            chmod -R 777 build/${{matrix.target}}/files/* ./
+        else
+            if [ -d "build/DIY/files" ]; then
+                cp -rf build/DIY/files files
+                chmod -R 777 build/${{matrix.target}}/files/* ./
+            else
+                echo "错误: files目录不存在"
+            fi
+        fi
+        
+        
+        
+        
+        if [ -n "$(ls -A "build/${{matrix.target}}/patches" 2>/dev/null)" ]; then                   # 判断patches目录
+            find "build/${{matrix.target}}/patches" -type f -name '*.patch' -print0 | sort -z | xargs -0 -I % sh -c 'cat "%" | patch -d "./" -p1 --forward --no-backup-if-mismatch'
+        else
+            if [ -d "build/DIY/patches" ]; then
+                find "build/DIY/patches" -type f -name '*.patch' -print0 | sort -z | xargs -0 -I % sh -c 'cat "%" | patch -d "./" -p1 --forward --no-backup-if-mismatch'
+            else
+                echo "错误: patches目录不存在"
+            fi
+        fi
+            
+            
+        if [ -f "build/${{matrix.target}}/$CONFIG_FILE" ]; then                                    # 判断.config 文件  优先加载 lede_x86/.config 文件,其次加载 build/DIY/.config 文件；最后复制到openwrt源码内。
+            mv build/${{matrix.target}}/$CONFIG_FILE .config
+        else
+            cp -rf build/DIY/$CONFIG_FILE .config
+        fi  
+            
+            
+            
+            
+            
+            
+        # if [ -n "$(ls -A "build/${{matrix.target}}/diy" 2>/dev/null)" ]; then                      # 判断diy目录  备用旧命令
+            # cp -rf build/${{matrix.target}}/diy/* ./
+        # else
+            # cp -rf build/DIY/diy/* ./ 
+        # fi
+        
+        
+        
+        # if [ -n "$(ls -A "build/${{matrix.target}}/files" 2>/dev/null)" ]; then                    # 判断files目录  备用旧命令
+            # cp -rf build/${{matrix.target}}/files files
+            # chmod -R 777 build/${{matrix.target}}/files/* ./
+        # else
+            # cp -rf build/DIY/files files
+            # chmod -R 777 build/${{matrix.target}}/files/* ./
+            
+        # fi
+        
+        
+        
+        # [ -d build/DIY/files ] && {
+            # cp -rf build/DIY/files files;
+            # chmod -R 777 build/${{matrix.target}}/files/* ./;
+        # }
+        
+        
+        # cp -rf build/${{matrix.target}}/files files 2>/dev/null || cp -rf build/DIY/files files chmod -R 777 build/${{matrix.target}}/files
+        
+        
+        
+        # if [ -n "$(ls -A "build/${{matrix.target}}/patches" 2>/dev/null)" ]; then                  # 判断patches目录   备用旧命令
+            # find "build/${{matrix.target}}/patches" -type f -name '*.patch' -print0 | sort -z | xargs -I % -t -0 -n 1 sh -c "cat '%'  | patch -d './' -p1 --forward --no-backup-if-mismatch"
+        # else
+            # find "build/DIY/patches" -type f -name '*.patch' -print0 | sort -z | xargs -I % -t -0 -n 1 sh -c "cat '%'  | patch -d './' -p1 --forward --no-backup-if-mismatch"
+        # fi
+        
+        
+        
+    - name: SSH链接（到此预计10分钟）             ## SSH connection to Actions
+      uses: P3TERX/ssh2actions@main               ## https://github.com/P3TERX/ssh2actions
+      if: (github.event.inputs.ssh == 'true' && github.event.inputs.ssh  != 'false') || contains(github.event.action, 'ssh')
+      env:
+        TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+        
+        
+        
+    - name: 上传SSH自定义.config配置文件              ## 上传到github空间
+      uses: actions/upload-artifact@v4       ## https://github.com/actions/upload-artifact
+      if: (github.event.inputs.ssh == 'true' && github.event.inputs.ssh  != 'false') || contains(github.event.action, 'ssh')
+      with:
+        name: SSH.config
+        path: openwrt/.config
+        
+        
+        
+    - name: 下载DL库                             ## Download package
+      id: package
+      run: |
+        cd openwrt                               # 进入“openwrt”源码目录
+        
+        make defconfig                           # 自动生成.config文件
+        make -j$(($(nproc)+1)) download V=s      # 全线程下载DL库
+        
+        find dl -size -1024c -exec ls -l {} \;   # 检查小于1KB文件
+        find dl -size -1024c -exec rm -f {} \;   # 删除小于1KB文件
+        
+        make -j1 download V=s                    # 再次执行下载DL库
+        
+        
+        
+    - name: 开始编译固件                         ## Compile the firmware
+      id: compile
+      run: |
+        cd openwrt                               # 进入“openwrt”源码目录
+        
+        echo -e "CPU线程数：$(($(nproc)+1))   进行全线程编译..."     # 显示当前CPU线程数
+        make -j$(($(nproc)+1)) V=s || make -j1 V=s                    # 首选全速线程编译，如果报错 再进行单线程编译排查错误！
+        
+        
+        echo "status=success" >> $GITHUB_OUTPUT                       # 假如状态反馈成功，则输出到变量
+        
+        
+        
+        ## 根据编译后.config配置文件判断变量
+        DEVICE=$(egrep -o "CONFIG_TARGET.*DEVICE.*=y" .config | sed -r 's/.*(.*)=y/\0/')            # DEVICE  = 固件机型的变量（在.config配置文件中得出）
+        DEVICE2=$(egrep -o "CONFIG_TARGET.*_64_Generic=y" .config | sed -r 's/.*(.*)=y/\0/')        # DEVICE2 = 固件平台的变量（在.config配置文件中得出）如：X86、
+        if [ $DEVICE == "CONFIG_TARGET_x86_64_DEVICE_generic=y" ]; then                             # 当固件机型含generic时，输出变量=      小写generic = DEVICE 变量 /= NAME1 （固件平台“x86-64”）
+         echo "NAME1=x86-64" >> $GITHUB_ENV
+        elif [ $DEVICE2 == "CONFIG_TARGET_x86_64_Generic=y" ]; then                                 # 当固件机型含Generic时，输出变量=      大写Generic= DEVICE2 变量 /= NAME1 （固件平台“x86-64”）
+         echo "NAME1=x86-64" >> $GITHUB_ENV
+        elif [ ${{matrix.target}} == "lede_N1" -o ${{matrix.target}} == "Project_N1" ];then         # 当编译N1机型目录时，输出变量=          N1的执行判断 / NAME1 = “n1,Vplus,Beikeyun,L1Pro,S9xxx”
+         echo "NAME1=n1,Vplus,Beikeyun,L1Pro,S9xxx" >> $GITHUB_ENV
+        elif [ $DEVICE != "CONFIG_TARGET_x86_64_DEVICE_generic=y" ]; then                           # 没有“x86-64”时 = NAME1 /= “DEVICE_”字符后名称（如竞斗云：p2w_r619ac-128m）
+         grep '^CONFIG_TARGET.*DEVICE.*=y' .config | sed -r 's/.*DEVICE_(.*)=y/\1/' > NAME1
+         [ -s NAME1 ] && echo "NAME1=$(cat NAME1)" >> $GITHUB_ENV
+        fi                                                                                          # NAME1 = x86-64（与DEVICE_NAME变量对等=提取是“generic”）
+        
+        
+        
+    - name: 检查空间使用情况                        ## Check space usage
+      if: (!cancelled())                            ## 返回 false  操作没有取消时，继续运行。 !cancelled() = true取消    false没有取消
+      run: df -hT
+        
+        
+        
+    - name: 上传bin目录(全部固件+ipk)               ## Upload bin directory
+      uses: actions/upload-artifact@v4              ## https://github.com/actions/upload-artifact
+      if: steps.compile.outputs.status == 'success' && env.UPLOAD_BIN_DIR == 'true'                 # 判断 id: compile 如果输出成功，就执行上传。
+      with:
+        name: Bin_${{ env.NAME2 }}${{ env.NAME1 }}_${{ env.date }}     # 文件名称
+        path: openwrt/bin   # bin目录路径
+        
+        
+        
+    # - name: N1云脚本打包    # 将 Armvirt 打包为 OpenWrt
+      # uses: ophub/flippy-openwrt-actions@main     ## https://github.com/ophub/flippy-openwrt-actions
+      # env:
+        # OPENWRT_ARMVIRT: openwrt/bin/targets/*/*/*rootfs.tar.gz     # N1编译固件路径
+        # PACKAGE_SOC: s905d                                    # 盒子型号，默认只是N1
+        # KERNEL_VERSION_NAME: 6.1.79                           # 内核版本
+        # WHOAMI: huangqian8                                    # 作者著名，
+
+        # https://github.com/ophub/flippy-openwrt-actions/blob/main/README.cn.md    # N1云脚本打包
+
+
+
+    - name: 编译N1机型时,打包（N1、微加云、贝壳云、我家云、S9xxx）固件
+      run: |
+        ## 已删库
+        if [ ${{matrix.target}} == "lede_N11" -o ${{matrix.target}} == "Project_N11" ];then                    # 当编译N1机型目录时，复制N1固件到打包目录下，
+            git clone https://github.com/tuanqing/mknop reform
+            cp openwrt/bin/targets/armvirt/*/*.tar.gz reform/openwrt                                         # 复制要打包的文件至 reform/openwrt 目录内
+            
+            cd reform
+            sudo ./gen_openwrt -d -k latest                                                                  # 进入打包源码目录内，打包所有的固件！！！sudo ./gen_openwrt -d -k latest -m phicomm-n1      ## 只打包N1固件
+            devices=("phicomm-n1" "rk3328" "s9xxx" "vplus")
+            cd out
+            for x in ${devices[*]}; do
+                cd $x
+                filename=$(ls | awk -F '.img' '{print $1}')
+                gzip *.img
+                cd ../
+                echo "firmware_$x=$filename" >> $GITHUB_ENV
+            done
+                cd ../../
+                mv -f reform/out/*/*.img.gz openwrt/bin/targets/armvirt/*                                        # 移动N1机型固件到默认bin目录下
+        fi
+        
+        
+        
+        
+        
+        
+        if [ ${{matrix.target}} == "lede_N1" -o ${{matrix.target}} == "Project_N1" ];then
+            git clone https://github.com/wxfyes/N1packaging.git N1opt                                        ## 下载N1打包源码（与 openwrt、build 同一目录）
+            
+            ## N1打包“70+0核心”（推荐70+o稳定版）
+            sudo chmod  -R 777 /opt
+            find N1opt/70+o/opt/* -name "*kernel*" | xargs -i cp -r {} /opt
+            cp openwrt/bin/targets/*/*/*.tar.gz /opt/kernel/openwrt-armvirt-64-default-rootfs.tar.gz
+            cd /opt/kernel
+            sudo chmod  -R 777 /opt
+            sudo chmod +x *.sh
+            sudo ./mk_s905d_n1.sh                                                                            ## 开始N1打包脚本命令！！！
+            sudo chmod -R 777 tmp
+            mv tmp/N1-*-70+o.img tmp/N1-lede-70+o.img
+            sudo cp files/update-amlogic-openwrt.sh tmp/update-amlogic-openwrt.sh
+            cd tmp
+            sudo pigz -9 N1-*-70+o.img
+            mv -f *.img.gz -t $GITHUB_WORKSPACE/openwrt/bin/targets/armvirt/*
+            mv -f *.sh -t $GITHUB_WORKSPACE/openwrt/bin/targets/armvirt/*
+            rm -rf /opt/kernel                                                                               ## 删除根目录下的/opt/kernel目录文件
+            
+            cd $GITHUB_WORKSPACE                                                                             ## 进入 仓库名称的 执行工作目录（与 openwrt、build 同一目录）
+            
+            ## N1打包“70+核心”测试版（和70+o打包命令一致）
+            sudo chmod  -R 777 /opt
+            find N1opt/70+/opt/* -name "*kernel*" | xargs -i cp -r {} /opt
+            cp openwrt/bin/targets/*/*/*.tar.gz /opt/kernel/openwrt-armvirt-64-default-rootfs.tar.gz
+            cd /opt/kernel
+            sudo chmod  -R 777 /opt
+            sudo chmod +x *.sh
+            sudo ./mk_s905d_n1.sh
+            sudo chmod -R 777 tmp
+            mv tmp/N1-*-70+.img tmp/N1-lede-70+.img
+            sudo cp files/update-amlogic-openwrt.sh tmp/update-amlogic-openwrt.sh
+            cd tmp
+            sudo pigz -9 N1-*-70+.img
+            mv -f *.img.gz -t $GITHUB_WORKSPACE/openwrt/bin/targets/armvirt/*
+            mv -f *.sh -t $GITHUB_WORKSPACE/openwrt/bin/targets/armvirt/*
+            rm -rf /opt/kernel
+            
+            rm -rf $GITHUB_WORKSPACE/N1opt                                                                   ## 已打包完成，删除N1打包源码
+        else
+            echo "***未选择N1机型，跳过打包步骤***"
+            
+        fi
+        
+        echo "status=success" >>$GITHUB_OUTPUT        # 假如状态反馈成功，则输出到变量
+        
+        
+        
+        
+    - name: 整理文件                           ## Organize files
+      id: organizer
+      run: |
+        mkdir config                                                                                  # 创建config文件夹，只存放.config配置文件；
+        find openwrt/bin/targets/ -name "*config.buildinfo*" | xargs -i mv -f {} config               # 搜索 输出固件目录中“config.buildinfo”文件，并移动至刚创建的 config 文件夹内 （-f =强制移动）
+        
+        if [ -n "$(ls -A "openwrt/bin/targets/x86" 2>/dev/null)" ]; then                              # 判断 只搜索X86固件的核心
+         find openwrt/bin/targets/x86/* -name "*kernel*" | xargs -i mv -f {} openwrt/bin/targets      # 搜索 输出固件目录中含有“kernel”名称的核心文件 并移动至targets目录内（只搜索X86固件的核心）
+        fi
+        
+        cd openwrt/bin/targets/*/*                                                                     # 切换到固件输出目录下
+        
+        rm -rf packages && mkdir packages                                                              # 删除“packages”文件夹，再新创建“packages”文件夹（临时存放下面多余的文件，等会删除）
+        find -name "*buildinfo*" | xargs -i mv -f {} packages                                          # 搜索“buildinfo”        并移动至新创建的“packages”文件夹内
+        find -name "*manifest*" | xargs -i mv -f {} packages                                           # 搜索“manifest”         并移动至新创建的“packages”文件夹内
+        find -name "*profiles*" | xargs -i mv -f {} packages                                           # 搜索“profiles”         并移动至新创建的“packages”文件夹内
+        find -name "*sha256sums*" | xargs -i mv -f {} packages                                         # 搜索“sha256sums”       并移动至新创建的“packages”文件夹内
+        find -name "*vmlinuz*" | xargs -i mv -f {} packages                                            # 搜索“vmlinuz”          并移动至新创建的“packages”文件夹内
+        find -name "*Image*" | xargs -i mv -f {} packages                                              # 搜索“Image”            并移动至新创建的“packages”文件夹内
+        rm -rf packages                                                                                # 删除“packages”文件夹，只保留重要固件镜像
+        
+        echo "FIRMWARE=$PWD" >> $GITHUB_ENV                                                            # 当前 pwd 执行目录（固件输出的目录），变量为：FIRMWARE
+        echo "status=success" >>$GITHUB_OUTPUT                                                         # 假如状态反馈成功，则输出到变量
+        
+        
+        
+    - name: 上传.config配置文件              ## 上传到github空间
+      uses: actions/upload-artifact@v4       ## https://github.com/actions/upload-artifact
+      if: steps.organizer.outputs.status == 'success' && env.UPLOAD_CONFIG == 'true' && !cancelled()
+      with:
+        name: .config_${{ env.NAME2 }}${{ env.NAME1 }}
+        path: ./config                       ## 当前目录的 config 文件夹
+        
+        
+        
+    - name: 上传dl库到github空间             ## Upload firmware directory
+      uses: actions/upload-artifact@main     ## https://github.com/actions/upload-artifact
+      if: steps.organizer.outputs.status == 'success' && env.UPLOAD_FIRMWARE == 'true'
+      with:
+        name: dl库_${{ env.NAME2 }}${{ env.NAME1 }}_${{ env.date }}      ## 如果上传固件改为：firmware
+        path: openwrt/dl                     ## dl库目录路径，              如果上传固件改为：${{ env.FIRMWARE }} 
+        
+        
+        
+    - name: 上传固件到奶牛快传               ## Upload firmware to cowtransfer （已失效，需要登录才能上传）
+      id: cowtransfer
+      if: steps.organizer.outputs.status == 'success' && env.UPLOAD_COWTRANSFER == 'true' && !cancelled()
+      run: |
+        curl -fsSL https://git.io/file-transfer | sh                                                     ## 下载执行脚本   项目仓库：https://github.com/Mikubill/transfer
+        
+        ## -f=连接失败时不显示http错误  s=静音模式。不输出任何东西    S=只输出错误信息（通常与-s共用）   -L=会让 HTTP 请求跟随服务器的重定向。curl 默认不跟随重定向。
+        ./transfer cow --block 2621440 -s -p 64 --no-progress ${FIRMWARE} 2>&1 | tee cowtransfer.log
+        
+        pwd && ls   
+        cat cowtransfer.log
+        
+        echo "::warning file=奶牛快传（${{matrix.target}}）::$(cat cowtransfer.log | grep https)"
+        echo "url=$(cat cowtransfer.log | grep https | cut -f3 -d" ")" >> $GITHUB_OUTPUT
+        
+        
+        
+        
+        # curl -fsSL git.io/file-transfer | sh
+        # ./transfer cow --block 2621440 -s -p 64 --no-progress ${FIRMWARE} 2>&1 | tee cowtransfer.log
+        # echo "::warning file=奶牛快传（${{matrix.target}}）::$(cat cowtransfer.log | grep https)"
+        # echo "::set-output name=url::$(cat cowtransfer.log | grep https | cut -f3 -d" ")"     # 被弃用      ## 解决方法：https://github.blog/changelog/2022-10-11-github-actions-deprecating-save-state-and-set-output-commands/
+        # set-output被弃用解决方法： https://www.right.com.cn/forum/thread-8271912-1-1.html
+        
+        
+        
+    - name: 上传固件到WeTransfer          ## Upload firmware to WeTransfer
+      id: wetransfer
+      if: steps.organizer.outputs.status == 'success' && env.UPLOAD_WETRANSFER == 'true' && !cancelled()
+      run: |
+        curl -fsSL https://git.io/file-transfer | sh
+        ./transfer wet -s -p 16 --no-progress ${FIRMWARE} 2>&1 | tee wetransfer.log
+        echo "::warning file=WeTransfer链接（${{matrix.target}}）::$(cat wetransfer.log | grep https)"
+        echo "url=$(cat wetransfer.log | grep https | cut -f3 -d" ")" >> $GITHUB_OUTPUT
+        
+        
+        
+    - name: 上传到SSH服务器               ##Deploy files to server
+      uses: easingthemes/ssh-deploy@main
+      continue-on-error: true             ## 出错时继续执行
+      if: env.SSH_PRIVATE_KEY && ! contains(github.event.action, 'noser')
+      with:
+        SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+        ARGS: "-rlgoDzvc -i"
+        SOURCE: ${{ env.FIRMWARE }}                      ## 上传的原目录（多个源应以空格分隔。）
+        REMOTE_HOST: ${{ secrets.REMOTE_HOST }}          ## 远程主机
+        REMOTE_USER: ${{ secrets.REMOTE_USER }}          ## 远程用户
+        TARGET: ${{ secrets.REMOTE_TARGET }}             ## 目标目录   默认："/www/wwwroot/op.supes.top/firmware/${{matrix.target}}/"
+        
+        
+        
+    - name: 提取「奶牛快传」&「WeTransfer」下载链接       ## 自动提取链接
+      if: steps.organizer.outputs.status == 'success' && env.UPLOAD_RELEASE == 'true' && !cancelled()
+      run: |
+        curl -fsSL git.io/file-transfer | sh
+        ./transfer cow --block 2621440 -s -p 64 --no-progress ${FIRMWARE} 2>&1 | tee cowtransfer.log
+        
+        echo "COWTRANSFER_URL=$(cat cowtransfer.log | grep https | cut -f3 -d" ")" >> $GITHUB_ENV
+        
+        curl -fsSL git.io/file-transfer | sh
+        ./transfer wet -s -p 16 --no-progress ${FIRMWARE} 2>&1 | tee wetransfer.log
+        
+        echo "WETRANSFER_URL=$(cat wetransfer.log | grep https | cut -f3 -d" ")" >> $GITHUB_ENV
+        
+        
+        
+#--------------------------------------------
+#    - name: 生成发布标签 #Generate release tag
+#      id: tag
+#      if: env.UPLOAD_RELEASE == 'true' && !cancelled()
+#      run: |
+#        echo "::set-output name=release_tag::$(date +"%Y.%m.%d-%H%M")"
+#        touch release.txt
+#        [ $UPLOAD_COWTRANSFER = true ] && echo "🔗 [Cowtransfer](${{ steps.cowtransfer.outputs.url }})" >> release.txt
+#        [ $UPLOAD_WETRANSFER = true ] && echo "🔗 [WeTransfer](${{ steps.wetransfer.outputs.url }})" >> release.txt
+#        echo "::set-output name=status::success"
+#--------------------------------------------
+
+
+
+    - name: 发布固件                         ## 自动发布固件 releases主页下载
+      uses: softprops/action-gh-release@v2   ## https://github.com/softprops/action-gh-release
+      if: steps.organizer.outputs.status == 'success' && env.UPLOAD_RELEASE == 'true' && !cancelled()
+      env:
+        GITHUB_TOKEN: ${{ secrets.REPO_TOKEN }}
+      with:
+        name: ${{ env.date1 }} 「 ${{matrix.target}} 」固件#${{env.Run_number}}        ## 最大字号的标题
+        tag_name: ${{ env.date }}            ## 左侧标签页时间
+        body: |                              ## 文本显示
+            ☆  源码 : ${{ env.REPO_URL }}
+            ☆  分支 : ${{ env.REPO_BRANCH }}
+            ☆  感谢源码作者[ ${{ env.ZUOZHE }}大神 ]无私分享！
+            
+            🎉 [ ${{matrix.target}} ]固件下载 ✨
+            -
+            💐 奶牛快传(国内高速🚀下载)： ${{ env.COWTRANSFER_URL }}
+            
+            ⛄ WeTransfer(国外高速🚀下载)： ${{ env.WETRANSFER_URL }}
+            
+            🌴 链接有效期为7天，无需注册直接下载 🐤
+        files: ${{ env.FIRMWARE }}/*         ## 上传生成的所有固件
+        
+        
+
+        
+        
+    - name: 删除工作流运行                            ## Delete workflow runs
+      uses: Mattraks/delete-workflow-runs@main        ## GitRML/delete-workflow-runs@v2 已经停更     改为： https://github.com/Mattraks/delete-workflow-runs
+      with:
+        token: ${{ secrets.REPO_TOKEN }}
+        repository: ${{ github.repository }}   ## 执行当前仓库
+        retain_days: 1            ## 保留天数      （默认值：1）
+        keep_minimum_runs: 10     ## 保存最少运行数（默认值：3）
+        
+        
+        
+    - name: 删除旧发布版本            ## Remove old Releases
+      uses: dev-drprasad/delete-older-releases@v0.3.4          ## https://github.com/dev-drprasad/delete-older-releases
+      if: env.UPLOAD_RELEASE == 'true' && !cancelled()
+      with:
+        keep_latest: 30            ## 保留最少数（默认值：3）
+        delete_tags: true
+      env:
+        GITHUB_TOKEN: ${{ secrets.REPO_TOKEN }}
+        
+        
+        
+    # - name: 结束编译_微信通知
+      # uses: emon100/Action-Serverchan@v2
+      # if: steps.organizer.outputs.status == 'success' && env.SERVERCHAN_SCKEY == 'true' || (github.event.inputs.wxtz == 'wxtz' && github.event.inputs.wxtz  != 'false')
+      # with:
+        # SCKEY: ${{ secrets.SCKEY }}
+        # text: 恭喜！${{env.CangKu}}仓库的#${{env.Run_number}}号[${{matrix.target}}]编译成功啦！
+        # desp: 我亲爱的主人您编译的[${{matrix.target}}]机型文件中的${{ env.NAME2 }} ${{ env.NAME1 }}固件顺利编译完成了！
+        
+        
+              # 完成时间：${{ env.date1 }}
+              
+              
+              # 仓库名称：${{env.CangKu}}
+              
+              
+              # 工作流号：#${{env.Run_number}}号
+              
+              
+              # 固件名称：${{matrix.target}}
+
+              
+              # 奶牛快传：${{ env.COWTRANSFER_URL }}
+              
+              
+              # WeTransfer：${{ env.WETRANSFER_URL }}
+              
+              
+              # 发布地址：${{ env.GITURL }}/releases
+              
+
+              # 祝小主人见人爱，花见花开，车见车载，天天好心情🎈！！！
+
+
+    - name: 电报通知 #Telegram notification
+      if: env.TELEGRAM_BOT_TOKEN && ! contains(github.event.action, 'notg')
+      continue-on-error: true
+      run: |
+        [ steps.compile.outputs.status == 'success' ] && curl -k --data chat_id="${{ secrets.TELEGRAM_CHAT_ID }}" --data "text=🎉 OpenWrt ${{ env.date3 }} ${{matrix.target}} 编译成功 😋  https://op.supes.top/firmware/${{matrix.target}}/  ${{ env.COWURL }}   ${{ env.WETRANS }} 🚀" "https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage" || curl -k --data chat_id="${{ secrets.TELEGRAM_TO }}" --data "text=❌ OpenWrt ${{ env.date3 }} ${{matrix.target}} 编译失败 😂" "https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage"
+
+
+        
+    - name: 计算总运行时长
+      run : |
+        # 计算运行时长必要的依赖工具（bc awk）
+        
+        echo "$(date +%s)" > end_time.txt                   ## 结束时间 写入到“end_time.txt”文本中（与开头“start_time.txt”文本对应）
+        ELAPSED_MINUTES=$(awk -v start=$(cat start_time.txt) -v end=$(cat end_time.txt) 'BEGIN { elapsed = end - start; printf "%.2f", elapsed / 60 }')         ## = ELAPSED_MINUTES变量：计算运行时间，并保留两位小数点和保留前面有0
+        echo "ELAPSED_MINUTES=$ELAPSED_MINUTES" >> $GITHUB_ENV                                                                                                  ## 总运行时间（分钟）写入变量： ELAPSED_MINUTES    ELAPSED_TIME
+        
+        
+        
+    - name: 准备编译_微信通知             ## Github设置里需添微信SCKEY
+      uses: xhnmt/pushplus-action@v1.0.0  ## 加载执行仓库：hhttps://github.com/xhnmt/pushplus-action
+      continue-on-error: true             ## 出错时继续执行编译
+      if: env.SERVERCHAN_SCKEY == 'true' || (github.event.inputs.wxtz == 'wxtz' && github.event.inputs.wxtz  != 'false')      ## 判断 SERVERCHAN_SCKEY 变量为“开启”则运行，否则跳过；继续判断 工作流调度菜单为 wxtz 时“开启”运行，否则跳过；
+      with:
+        token: ${{ secrets.SCKEY }}
+        title: "编译[${{matrix.target}}]_${{env.CangKu}}仓库_#${{env.Run_number}}"
+        content: "
+              
+              仓库名称：${{env.CangKu}}
+              
+              
+              工作流号：#${{env.Run_number}}
+              
+              
+              固件名称：${{matrix.target}}
+              
+              
+              启动时间：${{ env.date1 }}
+              
+              
+              运行时间：全程用时 ${{ env.ELAPSED_MINUTES }} 分钟
+              
+              
+              "
+              ## 结尾
+              
+              
