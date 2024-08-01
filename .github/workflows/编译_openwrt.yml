@@ -90,7 +90,7 @@ env:
 
 
 jobs:
-  build:                                  ## 运行脚本的备注名称（可更改）
+  build-openwrt:                          ## 此脚本的任务名称（可自定义）
     runs-on: Ubuntu-20.04                 ## ←选择编译系统版本
     if: github.event.repository.owner.id == github.event.sender.id   ## 只有仓库所有者才能使用  “点 Star启动编译”
     
