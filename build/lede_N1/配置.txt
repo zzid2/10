@@ -1,0 +1,5 @@
+编译支持N1的固件配置：
+Target System (Broadcom BCM27xx) -->
+Subtarget (BCM2710 64 bit based boards) -->
+Target Profile (Raspberry Pi 3B/3B+) -->
+Target Images-->打开ext4 （NEW） -->

@@ -74,6 +74,20 @@ sed -i "s/'UTC'/'CST-8'\n\t\tset system.@system[-1].zonename='Asia\/Shanghai'/g"
 # https://github.com/garypang13/luci-theme-edge        # Edge 带背景音乐
 
 
+
+# 更改 Argon 主题背景
+cp -f $GITHUB_WORKSPACE/bg1.jpg package/luci-theme-argon/htdocs/luci-static/argon/img/bg1.jpg
+
+
+# x86 型号只显示 CPU 型号
+#sed -i 's/${g}.*/${a}${b}${c}${d}${e}${f}${hydrid}/g' package/lean/autocore/files/x86/autocore
+
+# 修改本地时间格式
+#sed -i 's/os.date()/os.date("%a %Y-%m-%d %H:%M:%S")/g' package/lean/autocore/files/*/index.htm
+
+#避免出现下面的警告 提前将mosdns_neo 改为mosdns （2022.08.13目前新版源码貌似已修复此警告）
+#sed -i 's/mosdns.*neo/mosdns/g' feeds/kenzo/luci-app-mosdns/Makefile
+
 # ----------------------无效的代码------------------------
 # 修改版本号
 # sed -i 's/V2020/V$(date "+%Y.%m.%d")/g' package/lean/default-settings/files/zzz-default-settings                  # 修改版本号 将文件中所有的 V2020 替换为当前日期，格式为 YYYY.MM.DD。

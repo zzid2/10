@@ -1,0 +1,43 @@
+CONFIG_TARGET_KERNEL_PARTSIZE=64
+CONFIG_TARGET_ROOTFS_PARTSIZE=900
+
+编译菜单，删除不掉的默认插件；
+luci-app-bird1-ipv4
+luci-app-bird1-ipv6
+luci-app-bmx6
+luci-app-cjdns
+luci-app-gobinetmodem
+luci-app-hnet
+luci-app-pcimodem
+luci-app-spdmodem
+luci-app-usbmodem
+
+
+
+编译常用的插件
+luci-app-firewall             # 防火墙
+luci-app-samba4            # 网络共享
+
+
+luci-app-adguardhome  # 去广告
+luci-app-argon-config    # Argon设置
+luci-app-bypass	      # 科学上网
+luci-app-filetransfer       # 安装ipk软件包
+luci-app-oaf	     # 应用访问过滤
+luci-app-openclash	     # 科学上网
+luci-app-passwall	     # 科学上网
+luci-app-passwall2        # 科学上网
+luci-app-poweroffdevice   # 设备关机
+luci-app-ssr-plus            # 科学上网
+luci-app-ttyd                  # ttyd命令窗口
+luci-app-turboacc	     # TurboACC网络加速
+luci-app-unblockmusic   # 解锁网易云音乐
+luci-app-vlmcsd             # KMS服务器
+luci-app-webadmin       # Web管理
+luci-app-wol	    # WOL网络唤醒
+luci-app-zerotier           # zerotier
+
+
+
+
+

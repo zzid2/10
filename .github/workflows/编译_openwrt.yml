@@ -29,16 +29,16 @@ on:
         default: 'release'         ## 输入：release=开启 actions=关闭
         
   
-  ## 对齐
+  ## 对齐符号
   # schedule:                        ## 定时触发开始编译(时间设置请看定时编译说明)
     # - cron: 30 8 */5 * *           ## 每间隔5天，在早上8.30执行
   
   
-  ## 对齐
+  ## 对齐符号
   # watch:                           ## 点☆Star触发开始编译
     # types: started
 
-  ## 对齐
+  ## 对齐符号
   push:                             ## 当代码推送到指定分支时      触发编译
     branches:
       - main                        ## 确保只在 main 分支有改动时，触发编译
@@ -46,7 +46,7 @@ on:
       - '.github/workflows/编译_openwrt.yml'               ## 只在这个文件有变化时 触发编译
       
       
-  ## 对齐
+  ## 对齐符号
   # release:                         ## release发布触发开始编译(只是一个触发条件,不会发布的,又麻烦,没卵用,不用研究)
     # types: published
 
@@ -99,7 +99,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        target: [lede_G-DOCK,lede_N1,lede_x86]                ## ←编译指定机型 “就是文件夹名称”，多选用英文逗号隔开可以同时编译；
+        target: [lede_x86]                ## ←编译指定机型 “就是文件夹名称”，多选用英文逗号隔开可以同时编译；
         # 目前可以选机型：openwrt,lede_G-DOCK,lede_hiwifi_HC5861,lede_linksys_Wrt32x,lede_N1,lede_x86
 
     
