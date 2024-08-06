@@ -117,55 +117,21 @@ function makes {             ## 通用配置（自定义插件）
 }
 
 
-is_local_network() {         ## 检查是否在局域网中
-    # 设定一个特定的局域网IP，例如10.10.10.10
-    ping -c 1 -W 1 10.10.10.10 &> /dev/null  # 将输出重定向以隐藏详细信息
-    return $?  # 返回ping命令的执行结果，0表示成功，非0表示失败
-}
-
-
 function down_dl {           ## 下载DL库压缩包（外网用不到！）
  cd ../
-if [ -d "$lede_path/dl" ]; then        ## 判断 Lede 目录内是否有“DL文件夹”， 如果没有 就“执行下载判断”
+if [ -d "$lede_path/dl" ]; then      ## 判断 Lede 目录内是否有“DL文件夹”， 如果没有 就“执行下载判断”
 	print_yellow "***DL库目录已经存在***"                                                          ## lede/dl 文件如果存在，提示跳过；
 else
-	if [ -f "./dl.tar.gz" ];then       ## 判断 当前目录是否有 dl.tar.gz 压缩包， 如果没有 就联网下载到当前目录内（下载判断）；
+	if [ -f "./dl.tar.gz" ];then   ## 判断 当前是否有 dl.tar.gz 压缩包， 如果没有 就联网下载到当前目录内（下载判断）；
 		print_green "***复制本地 dl.tar.gz 压缩包***"
 		cp dl.tar.gz $lede_path                                                                    ## 复制当前 dl.tar.gz 压缩包至Lede目录内；
 		tar -zxvf $lede_path/dl.tar.gz -C $lede_path/ && rm -f $lede_path/dl.tar.gz                ## 先解压 dl.tar.gz 压缩包，然后再删除压缩包；
 	else
-		if is_local_network; then
-			print_green "局域网环境,***使用链接1 下载 dl.tar.gz 压缩包***"
-			wget -P $lede_path http://10.10.10.16:21704/api/public/dl/GhWWQ_HT/dl.tar.gz           ## 联通下载 dl.tar.gz 压缩包至Lede目录内；   ## 在链接后缀加/dl.tar.gz
-			if [ $? -ne 0 ]; then
-				print_error "局域网下载失败，使用公网备用链接2下载..."
-				wget -P $lede_path http://42.225.30.171:21704/api/public/dl/GhWWQ_HT/dl.tar.gz     ## 联通下载_备用链接2
-				if [ $? -ne 0 ]; then
-					print_error "公网备用链接2下载失败，请检查网络连接或链接是否有效。"
-					return 1
-				else
-					print_green "公网备用链接2下载成功！"
-				fi
-			else
-				print_green "局域网链接1下载成功！"
-			fi
-			print_green "***局域网下载成功，开始解压缩 dl.tar.gz ***"
-			tar -zxvf $lede_path/dl.tar.gz -C $lede_path/ && rm -f $lede_path/dl.tar.gz            ## 先解压 dl.tar.gz 压缩包，然后再删除压缩包；
-		else
-			print_yellow "非局域网环境，使用链接3..."
-			wget -P $lede_path http://link3
-			if [ $? -ne 0 ]; then
-				print_error "链接3下载失败，请检查网络连接或链接是否有效。"
-				return 1
-			else
-				print_green "链接3下载成功！"
-			fi
-			print_green "***外网下载成功，开始解压缩 dl.tar.gz ***"
-			tar -zxvf $lede_path/dl.tar.gz -C $lede_path/ && rm -f $lede_path/dl.tar.gz            ## 先解压 dl.tar.gz 压缩包，然后再删除压缩包；
-		fi
+		print_green "***下载 dl.tar.gz 压缩包***"
+		wget -P $lede_path http://10.10.10.16:21704/api/public/dl/GhWWQ_HT/dl.tar.gz               ## 联通下载 dl.tar.gz 压缩包至Lede目录内；   ## 在链接后缀加/dl.tar.gz
+		tar -zxvf $lede_path/dl.tar.gz -C $lede_path/ && rm -f $lede_path/dl.tar.gz                ## 先解压 dl.tar.gz 压缩包，然后再删除压缩包；
 	fi
 fi
-
 
  cd $lede_path
 
