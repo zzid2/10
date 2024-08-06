@@ -76,7 +76,7 @@ sed -i "s/'UTC'/'CST-8'\n\t\tset system.@system[-1].zonename='Asia\/Shanghai'/g"
 
 
 # 更改 Argon 主题背景
-cp -f $GITHUB_WORKSPACE/bg1.jpg package/luci-theme-argon/htdocs/luci-static/argon/img/bg1.jpg
+cp -f $GITHUB_WORKSPACE/build/DIY/bg1.jpg package/otherapp/luci-theme-argon/htdocs/luci-static/argon/img/bg1.jpg
 
 
 # x86 型号只显示 CPU 型号
