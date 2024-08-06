@@ -577,6 +577,8 @@ jobs:
          find openwrt/bin/targets/x86/* -name "*kernel*" | xargs -i mv -f {} openwrt/bin/targets      # 搜索 输出固件目录中含有“kernel”名称的核心文件 并移动至targets目录内（只搜索X86固件的核心）
         fi
         
+        tar -czvf openwrt/bin/targets/*/*/dl.tar.gz openwrt/dl                                        # 压缩“dl”目录 至输出固件 的目录内；
+        
         cd openwrt/bin/targets/*/*                                                                     # 切换到固件输出目录下
         
         rm -rf packages && mkdir packages                                                              # 删除“packages”文件夹，再新创建“packages”文件夹（临时存放下面多余的文件，等会删除）
