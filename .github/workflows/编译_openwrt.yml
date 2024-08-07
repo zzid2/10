@@ -12,13 +12,13 @@
 
 name: 编译OpenWrt                  ## Actions工作流的名称  GItHub搜索：OpenWrt-CI
 on:
-  # repository_dispatch:             ## “源码更新_定时校验” 的工作流有更新时 触发此编译工作流。
   workflow_dispatch:               ## 手动触发工作流程_调度
     inputs:
       ssh:                         ## 做判断时用的ID名称（可更改）  
         description: 'SSH远程'     ## 工作流_菜单提示框的名称
         required: false
-        default: 'true-false'       ## 输入：true=开启 false=关闭
+        default: 'false'       ## 输入：true=开启 false=关闭
+        type: boolean                                  ## 将类型设置为布尔类型（复选框）
       wxtz:
         description: '微信通知'
         required: false
@@ -27,7 +27,11 @@ on:
         description: '发布固件'
         required: false
         default: 'release'         ## 输入：release=开启 actions=关闭
+
         
+  
+  # repository_dispatch:                                 ## 接收外部事件触发，“源码更新_定时校验”运行后触发编译。
+  
   
   ## 对齐符号
   # schedule:                        ## 定时触发开始编译(时间设置请看定时编译说明)
@@ -577,7 +581,10 @@ jobs:
          find openwrt/bin/targets/x86/* -name "*kernel*" | xargs -i mv -f {} openwrt/bin/targets      # 搜索 输出固件目录中含有“kernel”名称的核心文件 并移动至targets目录内（只搜索X86固件的核心）
         fi
         
-        tar -czvf openwrt/bin/targets/*/*/dl.tar.gz openwrt/dl                                        # 压缩“dl”目录 至输出固件 的目录内；
+        TARGET_DIR=$(echo openwrt/bin/targets/*/*)                                                    # 展开通配符路径
+        # export TARGET_DIR=$(echo openwrt/bin/targets/*/*)
+        tar -czvf ${TARGET_DIR}/dl.tar.gz -C openwrt dl                                               # 压缩“dl”目录 至输出固件 的目录内；
+        
         
         cd openwrt/bin/targets/*/*                                                                     # 切换到固件输出目录下
         

@@ -38,6 +38,10 @@ sed -i "s/OpenWrt /LEDE build $(TZ=UTC-8 date "+%Y.%m.%d") @ OpenWrt /g" package
 #sed -i '/set luci.main.mediaurlbase=\/luci-static\/bootstrap/d' feeds/luci/themes/luci-theme-bootstrap/root/etc/uci-defaults/30_luci-theme-bootstrap   # 命令的结果是删除代码：set luci.main.mediaurlbase=/luci-static/bootstrap
 # sed -i 's/ +luci-theme-bootstrap//g' feeds/luci/collections/luci/Makefile                                                                             # 取掉默认主题
 
+# 更改 Argon 主题背景
+cp -f $GITHUB_WORKSPACE/build/DIY/img/bg1.jpg package/otherapp/luci-theme-argon/htdocs/luci-static/argon/img/bg1.jpg
+
+
 
 # echo '修改时区'
 sed -i "s/'UTC'/'CST-8'\n\t\tset system.@system[-1].zonename='Asia\/Shanghai'/g" package/base-files/files/bin/config_generate                 ## 把 UTC 时区改为：CST-8  并换行添加：set system.@system[-1].zonename='Asia/Shanghai'（ \t\tset = 用于对齐新插入的行）
@@ -75,8 +79,7 @@ sed -i "s/'UTC'/'CST-8'\n\t\tset system.@system[-1].zonename='Asia\/Shanghai'/g"
 
 
 
-# 更改 Argon 主题背景
-cp -f $GITHUB_WORKSPACE/build/DIY/bg1.jpg package/otherapp/luci-theme-argon/htdocs/luci-static/argon/img/bg1.jpg
+
 
 
 # x86 型号只显示 CPU 型号
