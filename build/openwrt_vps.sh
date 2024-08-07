@@ -101,6 +101,17 @@ fi
 cd $lede_path                                                                     ## 进入Lede源码目录内并执行操作
 
 
+# 复制本地img背景图片；
+if [ -d "$project_path/DIY/img" ];then
+	print_green "***使用本地img背景图片***"
+else
+	print_yellow "***下载img背景图片***"
+	svn_export "main" "build/DIY/img" "$project_path/DIY/img" https://github.com/$CangKu
+fi
+mkdir -p build/DIY
+cp -rf $project_path/DIY/img $lede_path/build/DIY/img
+
+
 # 加载diy-part1.sh脚本；
 if [ -f "$project_path/DIY/diy-part1.sh" ];then   # 如果本地不存在，就在线下载；
 	print_green "***使用本地diy-part1.sh***"
@@ -111,17 +122,6 @@ fi
 cp -rf $project_path/DIY/diy-part1.sh $lede_path/diy-part1.sh     ## 复制到Lede源码目录内
 bash $lede_path/diy-part1.sh                                      ## Lede源码目录内执行
 rm -rf $lede_path/diy-part1.sh
-
-
-# 复制本地img背景图片；
-if [ -d "$project_path/DIY/img" ];then
-	print_green "***使用本地img背景图片***"
-else
-	print_yellow "***下载img背景图片***"
-	svn_export "main" "build/DIY/img" "$project_path/DIY/img" https://github.com/$CangKu
-fi
-mkdir -p build/DIY
-cp -rf $project_path/DIY/img $lede_path/build/DIY/img
 
 
 # 加载diy-part2.sh脚本；
