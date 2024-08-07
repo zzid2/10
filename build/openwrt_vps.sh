@@ -41,7 +41,7 @@ print_yellow() {                          ## 打印黄色字体
  REPO_URL="https://github.com/coolsnowwolf/lede"     ## Lede源码
  REPO_BRANCH="master"                                ## master分支
  REPO_MAIN="main"                                    ## main分支
- CangKu="zzid2/100"                                  ## 在线下载的仓库（如果更换仓库，这里需要修改）
+ CangKu="zzid2/10"                                  ## 在线下载的仓库（如果更换仓库，这里需要修改）
 
  
 # 单独下载GitHub文件夹
