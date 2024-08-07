@@ -323,10 +323,10 @@ jobs:
         
         if [ -n "$(ls -A "build/${{matrix.target}}/diy" 2>/dev/null)" ]; then                       # 判断diy目录  优先复制机型目录内的diy目录，如果没有 再复制 build/DIY/diy 文件目录至 openwrt 源码内。 
             echo "注意: 复制 diy目录 "
-            mv -f build/${{matrix.target}}/diy/* ./
+            cp -rf build/${{matrix.target}}/diy/* ./
         else
             if [ -d "build/DIY/diy" ]; then
-                mv -f build/DIY/diy/* ./
+                cp -rf build/DIY/diy/* ./
             else
                 echo "错误: diy目录不存在"
             fi
@@ -335,11 +335,11 @@ jobs:
         
         if [ -n "$(ls -A "build/${{matrix.target}}/files" 2>/dev/null)" ]; then                     # 判断 openwrt/files目录  （-n 表示如果有非空字符文件（就是有文件字符），则执行 then 后面的命令）
             echo "注意: 复制 files目录 "
-            mv -f build/${{matrix.target}}/files files
+            cp -rf build/${{matrix.target}}/files files
             chmod -R 777 build/${{matrix.target}}/files/* ./
         else
             if [ -d "build/DIY/files" ]; then
-                mv -f build/DIY/files files
+                cp -rf build/DIY/files files
                 chmod -R 777 build/${{matrix.target}}/files/* ./
             else
                 echo "错误: files目录不存在"
