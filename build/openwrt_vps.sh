@@ -113,6 +113,17 @@ bash $lede_path/diy-part1.sh                                      ## Lede源码�
 rm -rf $lede_path/diy-part1.sh
 
 
+# 复制本地img背景图片；
+if [ -d "$project_path/DIY/img" ];then
+	print_green "***使用本地img背景图片***"
+else
+	print_yellow "***下载img背景图片***"
+	svn_export "main" "build/DIY/img" "$project_path/DIY/img" https://github.com/$CangKu
+fi
+mkdir -p build/DIY
+cp -rf $project_path/DIY/img $lede_path/build/DIY/img
+
+
 # 加载diy-part2.sh脚本；
 if [ -f "$project_path/DIY/diy-part2.sh" ]; then   # 如果本地不存在，就在线下载；
 	print_green "***使用本地diy-part2.sh***"
@@ -134,17 +145,6 @@ else
 	svn_export "main" "build/DIY/configs" "$project_path/DIY/configs" https://github.com/$CangKu                                ## 下载configs        ## 参数1= 分支名, 参数2= 仓库子目录, 参数3= 本地目标目录, 参数4= 仓库地址。
 fi
 cp -rv $project_path/DIY/configs $lede_path/configs
-
-
-# 复制本地img背景图片；
-if [ -d "$project_path/DIY/img" ];then
-	print_green "***使用本地img背景图片***"
-else
-	print_yellow "***下载img背景图片***"
-	svn_export "main" "build/DIY/img" "$project_path/DIY/img" https://github.com/$CangKu
-fi
-mkdir -p build/DIY
-cp -rf $project_path/DIY/img $lede_path/build/DIY/img
 
 
 # 复制本地.config文件；
