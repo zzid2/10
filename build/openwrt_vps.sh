@@ -136,6 +136,16 @@ fi
 cp -rv $project_path/DIY/configs $lede_path/configs
 
 
+# 复制本地img背景图片；
+if [ -d "$project_path/DIY/img" ];then
+	print_green "***使用本地img背景图片***"
+else
+	print_yellow "***下载img背景图片***"
+	svn_export "main" "build/DIY/img" "$project_path/DIY/img" https://github.com/$CangKu
+fi
+cp -rf $project_path/DIY/img $lede_path/img
+
+
 # 复制本地.config文件；
 if [ -f "$project_path/DIY/.config" ]; then       ## 如果本地不存在，就在线下载；
 	print_green "***使用本地.config配置***"
@@ -145,6 +155,7 @@ else
 fi
 rm -f $lede_path/.config                            ## 先删除源码内默认的.config插件配置文件；
 cp -fv $project_path/DIY/.config $lede_path         ## 复制本地 DIY/.config插件配置文件至lede目录下；
+
 
 cd $project_path                                                                    ## 进入仓库项目的主目录内
 
