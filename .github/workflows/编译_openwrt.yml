@@ -228,12 +228,15 @@ jobs:
         sudo mkdir -p /workdir                         ## 在根目录下 新创建“workdir”目录，用于备份 openwrt 源码；
         sudo chown $USER:$GROUPS /workdir              ## 提高“workdir”目录的权限
         
-        if [ -f "build/DIY/env" ];then                 ## 安装环境文件env（自动去除"注释"信息）
-            echo "注意: 使用"build/DIY/env"依赖文件"
-            sudo -E apt-get -qq install -y $(awk '{print $1}' build/DIY/env)
+        
+        if [ -f "${GITHUB_WORKSPACE}/build/${{matrix.target}}/env" ];then                                ## 安装环境文件env（自动去除"注释"信息）
+            echo "注意: 使用机型目录内的 env 依赖文件"
         else
-            echo "错误: 未找到"env"依赖文件"
+            echo "注意: 移动"env"依赖文件；DIY目录下 移至机型目录内"
+            mv ${GITHUB_WORKSPACE}/build/DIY/env ${GITHUB_WORKSPACE}/build/${{matrix.target}}
         fi
+        sudo -E apt-get -qq install -y $(awk '{print $1}' ${GITHUB_WORKSPACE}/build/${{matrix.target}}/env)
+        
         
         sudo -E apt-get -qq install -y xz-utils btrfs-progs zip dosfstools uuid-runtime pigz             ## N1固件打包必需要的依赖
         
@@ -316,38 +319,31 @@ jobs:
             chmod +x build/${{matrix.target}}/$DIY_OEM_SH
             /bin/bash "build/${{matrix.target}}/$DIY_OEM_SH"
         fi
-            
-            
+        
+        
         if [ -n "$(ls -A "build/${{matrix.target}}/diy" 2>/dev/null)" ]; then                       # 判断diy目录  优先复制机型目录内的diy目录，如果没有 再复制 build/DIY/diy 文件目录至 openwrt 源码内。 
             echo "注意: 复制 diy目录 "
-            cp -rf build/${{matrix.target}}/diy/* ./
+            mv -f build/${{matrix.target}}/diy/* ./
         else
             if [ -d "build/DIY/diy" ]; then
-                cp -rf build/DIY/diy/* ./
+                mv -f build/DIY/diy/* ./
             else
                 echo "错误: diy目录不存在"
             fi
         fi
-            
-            
+        
+        
         if [ -n "$(ls -A "build/${{matrix.target}}/files" 2>/dev/null)" ]; then                     # 判断 openwrt/files目录  （-n 表示如果有非空字符文件（就是有文件字符），则执行 then 后面的命令）
             echo "注意: 复制 files目录 "
-            cp -rf build/${{matrix.target}}/files files
+            mv -f build/${{matrix.target}}/files files
             chmod -R 777 build/${{matrix.target}}/files/* ./
         else
             if [ -d "build/DIY/files" ]; then
-                cp -rf build/DIY/files files
+                mv -f build/DIY/files files
                 chmod -R 777 build/${{matrix.target}}/files/* ./
             else
                 echo "错误: files目录不存在"
             fi
-        fi
-        
-        
-        if [ -d "build/${{matrix.target}}/img" ];then                                               # 判断img背景图片目录
-            cp -rf "build/${{matrix.target}}/img" img
-        else
-            cp -rf "build/DIY/img" img
         fi
         
         
@@ -360,13 +356,13 @@ jobs:
                 echo "错误: patches目录不存在"
             fi
         fi
-            
-            
+        
+        
         if [ -f "build/${{matrix.target}}/$CONFIG_FILE" ]; then                                    # 判断.config 文件  优先加载 lede_x86/.config 文件,其次加载 build/DIY/.config 文件；最后复制到openwrt源码内。
-            mv build/${{matrix.target}}/$CONFIG_FILE .config
+            mv -f build/${{matrix.target}}/$CONFIG_FILE .config
         else
-            cp -rf build/DIY/$CONFIG_FILE .config
-        fi  
+            mv -f build/DIY/$CONFIG_FILE .config
+        fi
             
             
             

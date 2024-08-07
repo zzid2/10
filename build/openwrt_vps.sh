@@ -143,7 +143,8 @@ else
 	print_yellow "***下载img背景图片***"
 	svn_export "main" "build/DIY/img" "$project_path/DIY/img" https://github.com/$CangKu
 fi
-cp -rf $project_path/DIY/img $lede_path/img
+mkdir -p build/DIY
+cp -rf $project_path/DIY/img $lede_path/build/DIY/img
 
 
 # 复制本地.config文件；

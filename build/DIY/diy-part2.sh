@@ -40,7 +40,7 @@ sed -i "s/OpenWrt /LEDE build $(TZ=UTC-8 date "+%Y.%m.%d") @ OpenWrt /g" package
 
 # 更改 Argon 主题背景
 
-cp -f $lede_path/img/bg1.jpg package/otherapp/luci-theme-argon/htdocs/luci-static/argon/img/bg1.jpg
+cp -f $lede_path/build/DIY/img/bg1.jpg package/otherapp/luci-theme-argon/htdocs/luci-static/argon/img/bg1.jpg
 
 
 
