@@ -108,7 +108,7 @@ else
 	print_yellow "***下载img背景图片***"
 	svn_export "main" "build/DIY/img" "$project_path/DIY/img" https://github.com/$CangKu
 fi
-mkdir -p build/DIY/
+mkdir -p "$lede_path/build/DIY/img"
 cp -rf $project_path/DIY/img $lede_path/build/DIY/img
 
 
