@@ -169,6 +169,8 @@ fi
 
  cd $lede_path
 
+ print_green "***解压 dl.tar.gz 完成，开始联网下载剩余文件***"
+ 
  make -j$(($(nproc)+1)) download V=s      ## 全线程下载DL库
 # find dl -size -1024c -exec ls -l {} \;  ## 检查小于1KB文件
 # find dl -size -1024c -exec rm -f {} \;  ## 删除小于1KB文件
