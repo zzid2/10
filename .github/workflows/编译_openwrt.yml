@@ -286,7 +286,7 @@ jobs:
           
     - name: 加载DIY_1脚本                              ## Load custom feeds
       run: |
-        cp -Rf `find ./ -maxdepth 1 -type d ! -path './openwrt' ! -path './'` openwrt               # 只复制 "build“ 目录（包含所有文件） 至 openwrt目录下（-R 不复制目录） ，
+        cp -Rf `find ./ -maxdepth 1 -type d ! -path './openwrt' ! -path './'` openwrt               # 只复制 "build“ 目录内所有文件（-R 不复制目录） 至 openwrt目录下 ，
         
         cd openwrt                                                                                  # 后续执行命令默认进入：“openwrt”源码目录
         

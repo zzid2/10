@@ -98,9 +98,6 @@ else
 fi
 
 
-cd $lede_path                                                                     ## 进入Lede源码目录内并执行操作
-
-
 # 复制本地img背景图片；
 if [ -d "$project_path/DIY/img" ];then
 	print_green "***使用本地img背景图片***"
@@ -108,8 +105,12 @@ else
 	print_yellow "***下载img背景图片***"
 	svn_export "main" "build/DIY/img" "$project_path/DIY/img" https://github.com/$CangKu
 fi
-mkdir -p "$lede_path/build/DIY/img"
+mkdir -p "$lede_path/build/DIY"
 cp -rf $project_path/DIY/img $lede_path/build/DIY/img
+
+
+cd $lede_path                                                                     ## 进入Lede源码目录内并执行操作
+
 
 
 # 加载diy-part1.sh脚本；
