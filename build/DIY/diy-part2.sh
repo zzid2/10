@@ -66,10 +66,10 @@ sed -i "s/'UTC'/'CST-8'\n\t\tset system.@system[-1].zonename='Asia\/Shanghai'/g"
 
 # 修改 base.po 翻译文件
 sed -i 's/"管理权"/"改密码"/g' feeds/luci/modules/luci-base/po/zh-cn/base.po
-sed -i '/msgid "VPN"/{n;s/.*/msgstr "虚拟专用网络"/}' feeds/luci/modules/luci-base/po/zh-cn/base.po   ## 修改 VPN=虚拟专用网络
+sed -i '/msgid "VPN"/{n;s/.*/msgstr "虚拟网络"/}' feeds/luci/modules/luci-base/po/zh-cn/base.po   ## 修改 VPN=虚拟专用网络
 
 
-# 添加 base.po 翻译文件
+# 添加 base.po 翻译文件（当文件中没有时，添加）
 # echo -e '\nmsgid "VPN"\nmsgstr "虚拟专用网络"' >> feeds/luci/modules/luci-base/po/zh-cn/base.po       ## 添加 VPN=虚拟专用网络
 
 
