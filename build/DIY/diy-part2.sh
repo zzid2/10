@@ -42,7 +42,7 @@ sed -i "s/OpenWrt /LEDE build $(TZ=UTC-8 date "+%Y.%m.%d") @ OpenWrt /g" package
 cp -f $lede_path/build/DIY/img/bg1.jpg package/otherapp/luci-theme-argon/htdocs/luci-static/argon/img/bg1.jpg
 
 # echo '修改时区'
-sed -i "s/'UTC'/'CST-8'\n\t\tset system.@system[-1].zonename='Asia\/Shanghai'/g" package/base-files/files/bin/config_generate                 ## 把 UTC 时区改为：CST-8  并换行添加：set system.@system[-1].zonename='Asia/Shanghai'（ \t\tset = 用于对齐新插入的行）
+sed -i "s/'UTC'/'CST-8'\n\t\tset system.@system[-1].zonename='Asia\/Shanghai'/g" package/base-files/files/bin/config_generate                           ## 把 UTC 时区改为：CST-8  并换行添加：set system.@system[-1].zonename='Asia/Shanghai'（ \t\tset = 用于对齐新插入的行）
 
 # 修改内核版本
 # grep 'KERNEL_PATCHVER:=' target/linux/x86/Makefile                                                            ## 查看当前内核版本
@@ -61,27 +61,32 @@ sed -i "s/'UTC'/'CST-8'\n\t\tset system.@system[-1].zonename='Asia\/Shanghai'/g"
 
 
 # ----------------------我是分界线，以下是非必须部分--------------------------------------------------------------------------------------------
-# feeds/luci/modules/luci-mod-admin-full/luasrc/controller/admin/index.lua                # 直接编辑左侧菜单选项（不推荐）
-# feeds/luci/modules/luci-base/po/zh-cn/base.po                                           # 添加多语言翻译（推荐修改 base.po 文件）
+# feeds/luci/modules/luci-mod-admin-full/luasrc/controller/admin/index.lua                                      # 编辑 左侧菜单选项源文件（不推荐）
+# feeds/luci/modules/luci-base/po/zh-cn/base.po                                                                 # 添加 多语言翻译（推荐修改 base.po 文件）
 
-# 修改 base.po 翻译文件
-sed -i 's/"管理权"/"改密码"/g' feeds/luci/modules/luci-base/po/zh-cn/base.po
-sed -i '/msgid "VPN"/{n;s/.*/msgstr "虚拟网络"/}' feeds/luci/modules/luci-base/po/zh-cn/base.po   ## 修改 VPN=虚拟专用网络
+# 修改 base.po 翻译文件（菜单选项）
+sed -i 's/"管理权"/"改密码"/g' feeds/luci/modules/luci-base/po/zh-cn/base.po                                    ## 修改 管理权=改密码
+sed -i '/msgid "VPN"/{n;s/.*/msgstr "虚拟网络"/;b};$!b;$a\ \nmsgid "VPN"\nmsgstr "虚拟网络"' feeds/luci/modules/luci-base/po/zh-cn/base.po              ## 先查找替换，如果没有就添加， VPN=虚拟网络
 
 
-# 添加 base.po 翻译文件（当文件中没有时，添加）
-# echo -e '\nmsgid "VPN"\nmsgstr "虚拟专用网络"' >> feeds/luci/modules/luci-base/po/zh-cn/base.po       ## 添加 VPN=虚拟专用网络
+
+# 添加 base.po 翻译文件 （菜单选项）  （搜索"base.po"文件内容,如果内容中没有时 添加翻译文件；）
+# sed -i '/msgid "VPN"/{n;s/.*/msgstr "虚拟网络"/}' feeds/luci/modules/luci-base/po/zh-cn/base.po               ## 修改 VPN=虚拟专用网络
+# echo -e '\nmsgid "VPN"\nmsgstr "虚拟网络"' >> feeds/luci/modules/luci-base/po/zh-cn/base.po                   ## 添加 VPN=虚拟网络
 
 
 # 修改已有插件名
+sed -i 's/"Web 管理"/"Web管理"/g' feeds/luci/applications/luci-app-webadmin/po/zh-cn/webadmin.po
 # sed -i 's/TTYD 终端/命令窗/g' feeds/luci/applications/luci-app-ttyd/po/zh-cn/terminal.po
-# sed -i 's/"Turbo ACC 网络加速"/"Turbo ACC 网络加速"/g' feeds/luci/applications/luci-app-turboacc/po/zh-cn/turboacc.po            # 把默认 Turbo ACC 网络加速  修改为：网络加速
+# sed -i 's/"Turbo ACC 网络加速"/"Turbo ACC 网络加速"/g' feeds/luci/applications/luci-app-turboacc/po/zh-cn/turboacc.po                                 # 把默认 Turbo ACC 网络加速  修改为：网络加速
 sed -i 's/"KMS 服务器"/"KMS激活"/g' feeds/luci/applications/luci-app-vlmcsd/po/zh-cn/vlmcsd.po
-# sed -i 's/"Web 管理"/"Web管理"/g' feeds/luci/applications/luci-app-webadmin/po/zh-cn/webadmin.po
 
 
-# 移动插件菜单项
-#sed -i 's/{"admin", "vpn"/{"admin", "nas"/g' feeds/luci/applications/luci-app-zerotier/luasrc/controller/zerotier.lua      # 移动 “luci-app-zerotier” 从 vpn 移动至 nas 菜单中； （确保关联的 luasrc/controller/admin/index.lua 文件中存在）；
+
+# 移动插件菜单项 （菜单选项）
+sed -i 's/"vpn"/"nas"/g' feeds/luci/applications/luci-app-zerotier/luasrc/controller/zerotier.lua                                                       # 移动 “luci-app-zerotier” 从 vpn 移动至 nas 菜单中； （确保关联的 luasrc/controller/admin/index.lua 文件中存在）；
+# sed -i 's/"vpn"/"nas"/g' /usr/lib/lua/luci/controller/zerotier.lua && /etc/init.d/uhttpd restart                                                      # 在路由器上直接修改
+# sed -i 's/{"admin", "vpn"/{"admin", "nas"/g' feeds/luci/applications/luci-app-zerotier/luasrc/controller/zerotier.lua                                 # 只修改路径，其他不修改，不推荐！！
 
 
 
