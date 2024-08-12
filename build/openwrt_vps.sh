@@ -35,13 +35,13 @@ print_yellow() {                          ## 打印黄色字体
 
 
 # 环境变量
- project_path=$(cd `dirname $0`; pwd)                ## 当前脚本目录= （仓库目录）将当前脚本所在的目录路径 赋于成变量；
- lede_path="$project_path/lede"                      ## 赋于成变量= lede源码目录
+ project_path=$(cd `dirname $0`; pwd)                ## 脚本目录 = 当前脚本目录路径为变量
+ lede_path="$project_path/lede"                      ## lede源码 = lede目录路径为变量 
  
  REPO_URL="https://github.com/coolsnowwolf/lede"     ## Lede源码
  REPO_BRANCH="master"                                ## master分支
  REPO_MAIN="main"                                    ## main分支
- CangKu="zzid2/10"                                  ## 在线下载的仓库（如果更换仓库，这里需要修改）
+ CangKu="zzid2/10"                                   ## 在线下载的仓库（如果更换仓库，这里需要修改）
 
  
 # 单独下载GitHub文件夹
@@ -85,7 +85,7 @@ sudo -E apt-get -qq install -y xz-utils btrfs-progs zip dosfstools uuid-runtime 
 # 下载Lean源码
 if [ -d "$lede_path" ]; then         # 如果本地不存在，就在线下载
     print_green " ***退出脚本：请执行“make.sh”进行二次编译！！！*** "
-    exit 0           # 正常退出
+    exit 0           # Lean目录已存在，正常退出
 else
     print_yellow "***下载Lean大源码***"
     git clone --depth 1 $REPO_URL $lede_path
