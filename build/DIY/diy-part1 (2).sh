@@ -63,23 +63,57 @@ if [ -d "$lede_path/feeds/luci/applications" ]; then   # 如果存在，就删�
 	cd $lede_path/feeds/luci/applications           # 进入 LEDE源码内applications目录内；
 	mkdir -p app && mv -f ./* app                   # 临时创建app文件夹，移动当前全部文件到app目录内，后续会删除；
 	
-	PLUGINS_TO_KEEP=(
-		"luci-app-samba4"       # 网络共享
-		"luci-app-firewall"     # 防火墙
-		"luci-app-filetransfer" # 安装 ipk 软件包（文件传输）
-		"luci-app-ttyd"         # 网页终端命令行
-		"luci-app-turboacc"     # TurboACC 网络加速
-		"luci-app-vlmcsd"       # KMS 服务器设置
-		"luci-app-webadmin"     # Web 管理页面设置
-		"luci-app-wol"          # WOL 网络唤醒
-		"luci-app-zerotier"     # ZeroTier 内网穿透
-	)
-	for plugin in "${PLUGINS_TO_KEEP[@]}"; do
-		mv -f "app/$plugin" ./
-	done
+	# 移动保留的插件； mv -f app/插件名称 ./
+	mv -f app/luci-app-samba4 ./                    # 网络共享（必备插件）
+	mv -f app/luci-app-firewall ./                  # 防火墙（必备插件）
 	
-	rm -rf app
-
+	# mv -f app/luci-app-accesscontrol ./    		# 上网时间控制
+	# mv -f app/luci-app-acme ./             		# 自动申请证书
+	# mv -f app/luci-app-adblock ./					# ADB广告过滤
+	# mv -f app/luci-app-adbyby-plus ./            	# 广告屏蔽大师Plus +
+	# mv -f app/luci-app-advanced-reboot ./         # Linksys高级重启
+	# mv -f app/luci-app-airplay2 ./           		# 苹果 AirPlay2 无损音频接收服务器
+	# mv -f app/luci-app-aliyundrive-webdav ./		# 阿里云盘挂载-webdav
+	# mv -f app/luci-app-aria2 ./                   # Aria2下载工具
+	# mv -f app/luci-app-arpbind ./					# IP/MAC绑定
+	# mv -f app/luci-app-attendedsysupgrade ./		# 固件更新升级相关
+#	mv -f app/luci-app-autoreboot ./				# 计划定时重启（autopoweroff二选一）（常用）
+	# mv -f app/luci-app-baidupcs-web ./			# 百度网盘管理
+	# mv -f app/luci-app-cifs-mount ./				# CIFS/SMB（挂载远程SMB目录）
+	# mv -f app/luci-app-cpufreq ./					# CPU 性能优化调节设置 这个不显示！！！！（常用）
+#	mv -f app/luci-app-ddns ./						# 动态DNS（集成阿里DDNS客户端）（常用）
+	# mv -f app/luci-app-docker ./					# Docker容器 （与源码docker二选一）
+	# mv -f app/luci-app-dockerman ./				# 
+	# mv -f app/luci-app-eqos ./						# 设备网速限制
+	mv -f app/luci-app-filetransfer ./				# 安装ipk软件包（文件传输）（常用）
+#	mv -f app/luci-app-frpc ./					    # 内网穿透Frp客户端
+#	mv -f app/luci-app-frps ./					    # 内网穿透Frp服务端
+	# mv -f app/luci-app-guest-wifi ./				# WiFi访客网络
+	# mv -f app/luci-app-ipsec-server ./			# IPSec VPN 服务器（ipsec-vpnd二选一）
+	# mv -f app/luci-app-ipsec-vpnd ./				# IPSec VPN 服务器（ipsec-server二选一）
+#	mv -f app/luci-app-netdata ./					# Netdata实时监控（CPU详情图表）
+#	mv -f app/luci-app-nlbwmon ./					# 带宽监控（显示、配置、备份）（常用）
+	# mv -f app/luci-app-nps ./						# 内网穿透nps
+	# mv -f app/luci-app-ntpc ./					# NTP时间同步服务器
+	# mv -f app/luci-app-pptp-server ./				# PPTP VPN 服务器
+	# mv -f app/luci-app-pushbot ./					# 全能推送（serverchan钉钉推送的更名）
+	# mv -f app/luci-app-qbittorrent ./				# BT下载工具（qBittorrent）
+	# mv -f app/luci-app-ramfree ./					# 释放内存
+	# mv -f app/luci-app-samba ./					# 网络共享（Samba与Samba4二选一）
+	# mv -f app/luci-app-serverchan ./				# 微信推送（：微信、微信测试号版、TG电报）
+	# mv -f app/luci-app-syncdial ./				# 多拨虚拟网卡（原macvlan）
+	mv -f app/luci-app-ttyd ./						# 网页终端命令行（常用）
+	mv -f app/luci-app-turboacc ./   				# TurboACC网络加速
+	# mv -f app/luci-app-unblockmusic ./			# 网易云解锁插件
+	# mv -f app/luci-app-upnp ./					# 通用即插即用UPnP（端口自动转发）
+	mv -f app/luci-app-vlmcsd ./					# KMS服务器设置（常用）
+	# mv -f app/luci-app-vsftpd ./					# FTP服务器
+	mv -f app/luci-app-webadmin ./					# Web管理页面设置；修改80默认端口（常用）
+	# mv -f app/luci-app-wifischedule ./			# WiFi 计划
+	mv -f app/luci-app-wol ./						# WOL网络唤醒
+	# mv -f app/luci-app-wrtbwmon ./				# 实时流量监测（wrtbwmon-zhcn 二选一）
+	mv -f app/luci-app-zerotier ./					# ZeroTier内网穿透（常用）
+	rm -rf app                                      # 删除临时创建的app目录；
 #---------------------------------------------------------------------------------------------------------------------------------------
 
 
