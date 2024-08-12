@@ -51,6 +51,9 @@ sed -i "s/'UTC'/'CST-8'\n\t\tset system.@system[-1].zonename='Asia\/Shanghai'/g"
 # 修改输出固件名称（案例：Lede-20240726-openwrt）
 # sed -i 's/IMG_PREFIX:=$(VERSION_DIST_SANITIZED)/IMG_PREFIX:=Lede-$(shell date +%Y-%m-%d)-$(VERSION_DIST_SANITIZED)/g' include/image.mk
 
+
+
+
 # 添加自定义软件包（Luci插件）
 # echo '
 # CONFIG_PACKAGE_luci-app-mosdns=y
@@ -58,6 +61,15 @@ sed -i "s/'UTC'/'CST-8'\n\t\tset system.@system[-1].zonename='Asia\/Shanghai'/g"
 # CONFIG_PACKAGE_luci-app-openclash=y
 # ' >> .config
 
+
+# 取消Samba36  选择Samba4
+sed -i '/CONFIG_PACKAGE_autosamba=y/d' .config                    ## 取消勾选 autosamba
+sed -i '/CONFIG_PACKAGE_luci-app-samba=y/d' .config               ## 取消勾选 luci-app-samba
+sed -i '/CONFIG_PACKAGE_samba36-server=y/d' .config               ## 取消勾选 samba36-server
+echo "CONFIG_PACKAGE_luci-app-samba4=y" >> .config                ## 勾选 luci-app-samba4
+echo "CONFIG_PACKAGE_samba4=y" >> .config                         ## 勾选 samba4
+
+sed -i '/CONFIG_TARGET_IMAGES_CONSOLE=y/d' .config                ## 取消开机跑代码
 
 
 # ----------------------我是分界线，以下是非必须部分--------------------------------------------------------------------------------------------
