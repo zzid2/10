@@ -39,10 +39,10 @@ sed -i "s/OpenWrt /LEDE build $(TZ=UTC-8 date "+%Y.%m.%d") @ OpenWrt /g" package
 # sed -i 's/ +luci-theme-bootstrap//g' feeds/luci/collections/luci/Makefile                                                                             # 取掉默认主题
 
 # 更改 Argon 主题背景
-cp -f $lede_path/build/DIY/img/bg1.jpg package/otherapp/luci-theme-argon/htdocs/luci-static/argon/img/bg1.jpg
+# cp -f $lede_path/build/DIY/img/bg1.jpg package/otherapp/luci-theme-argon/htdocs/luci-static/argon/img/bg1.jpg
 
 # echo '修改时区'
-sed -i "s/'UTC'/'CST-8'\n\t\tset system.@system[-1].zonename='Asia\/Shanghai'/g" package/base-files/files/bin/config_generate                           ## 把 UTC 时区改为：CST-8  并换行添加：set system.@system[-1].zonename='Asia/Shanghai'（ \t\tset = 用于对齐新插入的行）
+# sed -i "s/'UTC'/'CST-8'\n\t\tset system.@system[-1].zonename='Asia\/Shanghai'/g" package/base-files/files/bin/config_generate                           ## 把 UTC 时区改为：CST-8  并换行添加：set system.@system[-1].zonename='Asia/Shanghai'（ \t\tset = 用于对齐新插入的行）
 
 # 修改内核版本
 # grep 'KERNEL_PATCHVER:=' target/linux/x86/Makefile                                                            ## 查看当前内核版本
@@ -63,13 +63,13 @@ sed -i "s/'UTC'/'CST-8'\n\t\tset system.@system[-1].zonename='Asia\/Shanghai'/g"
 
 
 # 取消Samba36  选择Samba4
-sed -i '/CONFIG_PACKAGE_autosamba=y/d' .config                    ## 取消勾选 autosamba
-sed -i '/CONFIG_PACKAGE_luci-app-samba=y/d' .config               ## 取消勾选 luci-app-samba
-sed -i '/CONFIG_PACKAGE_samba36-server=y/d' .config               ## 取消勾选 samba36-server
-echo "CONFIG_PACKAGE_luci-app-samba4=y" >> .config                ## 勾选 luci-app-samba4
-echo "CONFIG_PACKAGE_samba4=y" >> .config                         ## 勾选 samba4
+# sed -i '/CONFIG_PACKAGE_autosamba=y/d' .config                    ## 取消勾选 autosamba
+# sed -i '/CONFIG_PACKAGE_luci-app-samba=y/d' .config               ## 取消勾选 luci-app-samba
+# sed -i '/CONFIG_PACKAGE_samba36-server=y/d' .config               ## 取消勾选 samba36-server
+# echo "CONFIG_PACKAGE_luci-app-samba4=y" >> .config                ## 勾选 luci-app-samba4
+# echo "CONFIG_PACKAGE_samba4=y" >> .config                         ## 勾选 samba4
 
-sed -i '/CONFIG_TARGET_IMAGES_CONSOLE=y/d' .config                ## 取消开机跑代码
+# sed -i '/CONFIG_TARGET_IMAGES_CONSOLE=y/d' .config                ## 取消开机跑代码
 
 
 # ----------------------我是分界线，以下是非必须部分--------------------------------------------------------------------------------------------
@@ -96,7 +96,7 @@ sed -i 's/"KMS 服务器"/"KMS激活"/g' feeds/luci/applications/luci-app-vlmcsd
 
 
 # 移动插件菜单项 （菜单选项）
-sed -i 's/"vpn"/"nas"/g' feeds/luci/applications/luci-app-zerotier/luasrc/controller/zerotier.lua                                                       # 移动 “luci-app-zerotier” 从 vpn 移动至 nas 菜单中； （确保关联的 luasrc/controller/admin/index.lua 文件中存在）；
+# sed -i 's/"vpn"/"nas"/g' feeds/luci/applications/luci-app-zerotier/luasrc/controller/zerotier.lua                                                       # 移动 “luci-app-zerotier” 从 vpn 移动至 nas 菜单中； （确保关联的 luasrc/controller/admin/index.lua 文件中存在）；
 # sed -i 's/"vpn"/"nas"/g' /usr/lib/lua/luci/controller/zerotier.lua && /etc/init.d/uhttpd restart                                                      # 在路由器上直接修改
 # sed -i 's/{"admin", "vpn"/{"admin", "nas"/g' feeds/luci/applications/luci-app-zerotier/luasrc/controller/zerotier.lua                                 # 只修改路径，其他不修改，不推荐！！
 
