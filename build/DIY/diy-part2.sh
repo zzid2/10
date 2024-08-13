@@ -23,8 +23,8 @@ sed -i 's/192.168.1.1/10.10.10.1/g' package/base-files/files/bin/config_generate
 # 修改 root密码登录为空（免密码登录）
 sed -i 's@.*CYXluq4wUazHjmCDBCqXF*@#&@g' package/lean/default-settings/files/zzz-default-settings
 
-# ttyd 自动登录
-sed -i "s?/bin/login?/usr/libexec/login.sh?g" package/feeds/packages/ttyd/files/ttyd.config
+# ttyd （自动登录）
+# sed -i "s?/bin/login?/usr/libexec/login.sh?g" package/feeds/packages/ttyd/files/ttyd.config
 
 # 修改主机名（不能纯数字或者中文）在机型脚本中修改，这里不修改。
 # sed -i 's/OpenWrt/G-DOCK/g' package/base-files/files/bin/config_generate                                                                    ## 初始默认的“OpenWrt” 修改为：G-DOCK
