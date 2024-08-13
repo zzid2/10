@@ -24,11 +24,11 @@ sed -i 's/192.168.1.1/10.10.10.1/g' package/base-files/files/bin/config_generate
 sed -i 's@.*CYXluq4wUazHjmCDBCqXF*@#&@g' package/lean/default-settings/files/zzz-default-settings
 
 # ttyd （自动登录）
-# sed -i "s?/bin/login?/usr/libexec/login.sh?g" package/feeds/packages/ttyd/files/ttyd.config
+sed -i "s?/bin/login?/usr/libexec/login.sh?g" package/feeds/packages/ttyd/files/ttyd.config
 
 # 修改主机名（不能纯数字或者中文）在机型脚本中修改，这里不修改。
-# sed -i 's/OpenWrt/G-DOCK/g' package/base-files/files/bin/config_generate                                                                    ## 初始默认的“OpenWrt” 修改为：G-DOCK
-# sed -i '/uci commit system/i\uci set system.@system[0].hostname='OpenWrtx86'' package/lean/default-settings/files/zzz-default-settings      ## 生成默认的基础上添加为：OpenWrtx86
+# sed -i 's/OpenWrt/G-DOCK/g' package/base-files/files/bin/config_generate                                                                     ## 初始默认的“OpenWrt” 修改为：G-DOCK
+sed -i '/uci commit system/i\uci set system.@system[0].hostname='OpenWrt_x86'' package/lean/default-settings/files/zzz-default-settings      ## 生成默认的基础上添加为：OpenWrtx86（推荐修改）
 
 # 修改固件版本号 添加代码：LEDE build $(TZ=UTC-8 date "+%Y.%m.%d") 显示范例：LEDE build 2021.02.08 @ OpenWrt        说明：【LEDE=作者 + build=建造 + （UTC-8=字符编码 + date=时间格式）】
 sed -i "s/OpenWrt /LEDE build $(TZ=UTC-8 date "+%Y.%m.%d") @ OpenWrt /g" package/lean/default-settings/files/zzz-default-settings
