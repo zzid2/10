@@ -57,103 +57,104 @@ sed -i '$a src-git luciapp https://github.com/zzid2/luci-app' feeds.conf.default
 #---------------------------------------------------------------------------------------------------------------------------------------
 
 
-cd $lede_path   #---删除 LEDE源码内 luci/applications 自带插件
-if [ -d "$lede_path/feeds/luci/applications" ]; then   # 如果存在，就删除以下文件
-	print_error "***删除插件***   feeds/luci/applications "
-	cd $lede_path/feeds/luci/applications           # 进入 LEDE源码内applications目录内；
-	mkdir -p app && find . -mindepth 1 -maxdepth 1 ! -name app -exec mv {} app/ \;             # 临时创建app文件夹，移动当前全部文件到app目录内，后续会删除；
+cd $lede_path   #---删除 LEDE源码内 lede/feeds/luci/applications/* 自带插件
+if [ -d "$lede_path/feeds/luci/applications" ]; then                                           # 如果存在，只保留以下插件，其他插件全部删除；
+	print_error "***删除插件***   lede/feeds/luci/applications/* "
+	cd $lede_path/feeds/luci/applications                                                      # 进入 LEDE源码内applications目录内；
+	mkdir -p app && find . -mindepth 1 -maxdepth 1 ! -name app -exec mv {} app/ \;             # 创建 临时“app”目录，移动当前所有目录 到“app”目录内，后续会删除“app”目录；
 	
-	PLUGINS_TO_KEEP=(
-		"luci-app-samba4"       # 网络共享
-		"luci-app-firewall"     # 防火墙
-		"luci-app-filetransfer" # 安装 ipk 软件包（文件传输）
-		"luci-app-ttyd"         # 网页终端命令行
-		"luci-app-turboacc"     # TurboACC 网络加速
-		"luci-app-vlmcsd"       # KMS 服务器设置
-		"luci-app-webadmin"     # Web 管理页面设置
-		"luci-app-wol"          # WOL 网络唤醒
-		"luci-app-zerotier"     # ZeroTier 内网穿透
+	# 定义遍历目录为：applications
+	applications=(
+		"luci-app-samba4"                           # 网络共享
+		"luci-app-firewall"                         # 防火墙
+		"luci-app-filetransfer"                     # 安装 ipk 软件包（文件传输）
+		"luci-app-ttyd"                             # 网页终端命令行
+		"luci-app-turboacc"                         # TurboACC 网络加速
+		"luci-app-vlmcsd"                           # KMS 服务器设置
+		"luci-app-webadmin"                         # Web 管理页面设置
+		"luci-app-wol"                              # WOL 网络唤醒
+		"luci-app-zerotier"                         # ZeroTier 内网穿透
 	)
-	for plugin in "${PLUGINS_TO_KEEP[@]}"; do
-		mv -f "app/$plugin" ./
+	
+	# 定义变量值为：luci_applications
+	for luci_applications in "${applications[@]}"; do
+		mv -f "app/$luci_applications" ./                                                      # 移动 定义遍历目录  至“lede/feeds/luci/applications”当前目录内
 	done
 	
+	rm -rf app                                                                                 # 删除 “app”目录，只留当前插件目录，
+
+else
+	print_yellow "***目录不存在*** 路径：lede/feeds/luci/applications/* "
+fi
+
+#---------------------------------------------------------------------------------------------------------------------------------------
+
+cd $lede_path   #---删除 LEDE源码内 lede/luci/themes/* 自带主题
+if [ -d "$lede_path/feeds/luci/themes" ]; then                                                 # 如果存在，就删除以下插件目录
+	print_error "***删除插件***   lede/luci/themes/* "
+	cd $lede_path/feeds/luci/themes                                                            # 进入themes主题目录
+	
+	# 定义遍历目录为：themes
+	themes=(
+		"luci-theme-argon"                          # 删除Argon主题（旧版必删）
+		"luci-theme-argon-mod"                      # 删除Argon主题
+		"luci-theme-design"
+		"luci-theme-material"
+		"luci-theme-netgear"
+	)
+	
+	# 定义变量值为：luci_themes
+	for luci_themes in "${themes[@]}"; do
+		rm -rf "$luci_themes"                                                                 # 删除 遍历主题目录
+	done
+	
+else
+	print_yellow "***目录不存在*** 路径：lede/luci/themes/* "
+fi
+
+#---------------------------------------------------------------------------------------------------------------------------------------
+
+cd $lede_path   #---删除 luci-app目录内插件 lede/feeds/luciapp/*（自己整理的源）
+if [ -d "$lede_path/feeds/luciapp" ];then                                                     # 如果存在，就删除以下插件目录
+	print_error "***删除插件***   lede/feeds/luciapp/*（自己整理的源） "
+	cd $lede_path/feeds/luciapp
+
+	# 定义遍历目录为：luciapp
+	luciapp=(
+		".git"                                      # 删除多余的git目录
+	)
+	
+	# 定义变量值为：luci_luciapp ；并删除指定的目录或文件：luciapp
+	for luci_luciapp in "${luciapp[@]}"; do
+		rm -rf "$luci_luciapp"
+	done
+	
+else
+	print_yellow "***目录不存在*** 路径：lede/feeds/luciapp/* "
+fi
+
+#---------------------------------------------------------------------------------------------------------------------------------------
+
+
+cd $lede_path   #---删除 kenzok8目录内插件 lede/feeds/kenzok8/*
+if [ -d "$lede_path/feeds/kenzok8" ];then                                                     # 如果存在，就删除以下插件目录
+	print_error "***删除插件***   lede/feeds/kenzok8/* "
+	cd $lede_path/feeds/kenzok8
+	mkdir -p app && find . -mindepth 1 -maxdepth 1 ! -name app -exec mv {} app/ \;            # 临时创建app文件夹，移动当前全部文件到app目录内，后续会删除；
+	
+	# 定义遍历目录为：kenzok8
+	kenzok8=(
+		"luci-app-samba4"                           # 网络共享（必备插件）
+	)
+	
+	# 定义变量值为：luci_kenzok8 ；并删除指定的目录或文件：kenzok8
+	for luci_kenzok8 in "${kenzok8[@]}"; do
+		mv -f "app/$luci_kenzok8" ./
+	done
 	rm -rf app
-
-#---------------------------------------------------------------------------------------------------------------------------------------
-
-
-	cd $lede_path/feeds/luci/themes      # 进入themes主题目录
-	
-	rm -rf luci-theme-argon              # 删除Argon主题（旧版必删）
-	rm -rf luci-theme-argon-mod          # 删除Argon主题
-	# rm -rf luci-theme-bootstrap
-	rm -rf luci-theme-design
-	rm -rf luci-theme-material
-	rm -rf luci-theme-netgear
-else
-	print_yellow "***目录不存在*** 路径：feeds/luci/applications "
-fi
-
-
-cd $lede_path   #---删除 luci-app目录内插件（自己整理的源）
-if [ -d "$lede_path/feeds/luciapp" ];then   # 如果存在，就删除以下文件
-	print_error "***删除插件***   feeds/luciapp（自己整理的源） "
-	cd feeds/luciapp                      # 进入 LEDE源码内luciapp目录内；
-
-	rm -rf .git							  # 删除多余的git目录
-else
-	print_yellow "***目录不存在*** 路径：feeds/luciapp "
-fi
-#---------------------------------------------------------------------------------------------------------------------------------------
-
-
-cd $lede_path   #---删除 kenzok8目录内插件
-if [ -d "$lede_path/feeds/kenzok8" ];then  # 如果存在，就删除以下文件
-	print_error "***删除插件***   feeds/kenzok8 "
-	cd $lede_path/feeds/kenzok8           # 进入 LEDE源码内kenzok8目录内；
-	mkdir -p app && mv -f ./* app                   # 临时创建app文件夹，移动当前全部文件到app目录内，后续会删除；
-	
-	# 移动保留的插件； mv -f app/插件名称 ./
-#	mv -f app/luci-app-samba4 ./                    # 网络共享（必备插件）
-
-	rm -rf app                                      # 删除临时创建的app目录；
 else
 	print_yellow "***目录不存在*** 路径：feeds/kenzok8 "
 fi
-#---------------------------------------------------------------------------------------------------------------------------------------
-
-
-cd $lede_path   #---删除 smpackage目录内插件
-if [ -d "$lede_path/feeds/smpackage" ];then  # 如果存在，就删除以下文件
-	print_error "***删除插件***   feeds/smpackage "
-	cd $lede_path/feeds/smpackage          # 进入 LEDE源码内smpackage目录内；
-	mkdir -p app && mv -f ./* app                   # 临时创建app文件夹，移动当前全部文件到app目录内，后续会删除；
-	
-	# 移动保留的插件； mv -f app/插件名称 ./
-#	mv -f app/luci-app-samba4 ./                    # 网络共享（必备插件）
-
-	rm -rf app                                      # 删除临时创建的app目录；
-else
-	print_yellow "***目录不存在*** 路径：feeds/smpackage "
-fi
-#---------------------------------------------------------------------------------------------------------------------------------------
-
-
-cd $lede_path   #---删除 small目录内插件
-if [ -d "$lede_path/feeds/small" ];then  # 如果存在，就删除以下文件
-	print_error "***删除插件***   feeds/small "
-	cd $lede_path/feeds/small           # 进入 LEDE源码内small目录内；
-	mkdir -p app && mv -f ./* app                   # 临时创建app文件夹，移动当前全部文件到app目录内，后续会删除；
-	
-	# 移动保留的插件； mv -f app/插件名称 ./
-#	mv -f app/luci-app-samba4 ./                    # 网络共享（必备插件）
-
-	rm -rf app                                      # 删除临时创建的app目录；
-else
-	print_yellow "***目录不存在*** 路径：feeds/small "
-fi
-
 
 #---------------------------------------------------------------------------------------------------------------------------------------
 cd $lede_path
