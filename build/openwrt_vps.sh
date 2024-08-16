@@ -46,7 +46,6 @@ print_yellow() {                          ## 打印黄色字体
  
 # 单独下载GitHub文件夹
 svn_export() {
-	# 参数1是分支名, 参数2是子目录, 参数3是目标目录, 参数4仓库地址
 	trap 'rm -rf "$TMP_DIR"' 0 1 2 3
 	TMP_DIR="$(mktemp -d)" || exit 1
 	[ -d "$3" ] || mkdir -p "$3"
@@ -57,6 +56,8 @@ svn_export() {
 	git checkout "remotes/origin/$1" -- "$2" && \
 	cd "$2" && cp -a . "$TGT_DIR/"
 }
+##       参数1=分支名 + 参数2=仓库子目录 + 参数3=本地目录 + 参数4=仓库地址
+## svn_export "master" "scripts/config/lxdialog" "scripts/config/lxdialog" "https://github.com/coolsnowwolf/lede"
 
 
 cd $project_path                                                                ## 切换到仓库项目的主目录内
