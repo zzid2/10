@@ -59,7 +59,7 @@ sed -i '$a src-git luciapp https://github.com/zzid2/luci-app' feeds.conf.default
 
 cd $lede_path   #---删除 LEDE源码内 lede/feeds/luci/applications/* 自带插件
 if [ -d "$lede_path/feeds/luci/applications" ]; then                                           # 如果存在，只保留以下插件，其他插件全部删除；
-	print_error "***删除插件***   lede/feeds/luci/applications/* "
+	print_error "***删除插件***   lede/feeds/luci/applications/*** "
 	cd $lede_path/feeds/luci/applications                                                      # 进入 LEDE源码内applications目录内；
 	mkdir -p app && find . -mindepth 1 -maxdepth 1 ! -name app -exec mv {} app/ \;             # 创建 临时“app”目录，移动当前所有目录 到“app”目录内，后续会删除“app”目录；
 	
@@ -91,7 +91,7 @@ fi
 
 cd $lede_path   #---删除 LEDE源码内 lede/luci/themes/* 自带主题
 if [ -d "$lede_path/feeds/luci/themes" ]; then                                                 # 如果存在，就删除以下插件目录
-	print_error "***删除插件***   lede/luci/themes/* "
+	print_error "***删除插件***   lede/luci/themes/*** "
 	cd $lede_path/feeds/luci/themes                                                            # 进入themes主题目录
 	
 	# 定义遍历目录为：themes
@@ -116,7 +116,7 @@ fi
 
 cd $lede_path   #---删除 luci-app目录内插件 lede/feeds/luciapp/*（自己整理的源）
 if [ -d "$lede_path/feeds/luciapp" ];then                                                     # 如果存在，就删除以下插件目录
-	print_error "***删除插件***   lede/feeds/luciapp/*（自己整理的源） "
+	print_error "***删除插件***   lede/feeds/luciapp/***（自己整理的源） "
 	cd $lede_path/feeds/luciapp
 
 	# 定义遍历目录为：luciapp
@@ -138,7 +138,7 @@ fi
 
 cd $lede_path   #---删除 kenzok8目录内插件 lede/feeds/kenzok8/*
 if [ -d "$lede_path/feeds/kenzok8" ];then                                                     # 如果存在，就删除以下插件目录
-	print_error "***删除插件***   lede/feeds/kenzok8/* "
+	print_error "***删除插件***   lede/feeds/kenzok8/*** "
 	cd $lede_path/feeds/kenzok8
 	mkdir -p app && find . -mindepth 1 -maxdepth 1 ! -name app -exec mv {} app/ \;            # 临时创建app文件夹，移动当前全部文件到app目录内，后续会删除；
 	
