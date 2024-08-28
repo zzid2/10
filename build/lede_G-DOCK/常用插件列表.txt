@@ -13,20 +13,18 @@ luci-app-usbmodem
 
 
 编译常用的插件
-luci-app-firewall             # 防火墙
-luci-app-samba4            # 网络共享
-
-
 luci-app-adguardhome  # 去广告
 luci-app-argon-config    # Argon设置
+luci-app-autoreboot       # 计划定时重启（autopoweroff二选一）
 luci-app-bypass	      # 科学上网
 luci-app-filetransfer       # 安装ipk软件包
-luci-app-oaf	     # 应用访问过滤
+luci-app-firewall             # 防火墙
 luci-app-openclash	     # 科学上网
 luci-app-passwall	     # 科学上网
 luci-app-passwall2        # 科学上网
 luci-app-poweroffdevice   # 设备关机
 luci-app-ssr-plus            # 科学上网
+luci-app-store
 luci-app-ttyd                  # ttyd命令窗口
 luci-app-turboacc	     # TurboACC网络加速
 luci-app-unblockmusic   # 解锁网易云音乐
@@ -37,5 +35,7 @@ luci-app-zerotier           # zerotier
 
 
 
+luci-app-oaf	     # 应用访问过滤
+luci-app-samba4            # 网络共享
 
 

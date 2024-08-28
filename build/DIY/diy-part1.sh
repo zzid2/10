@@ -69,6 +69,8 @@ if [ -d "$lede_path/feeds/luci/applications" ]; then                            
 		"luci-app-firewall"                         # 防火墙
 		"luci-app-filetransfer"                     # 安装 ipk 软件包（文件传输）
 		"luci-app-ttyd"                             # 网页终端命令行
+		"luci-app-ipsec-server"                     # VPN服务器（与ipsec-vpnd   二选一）
+		"luci-app-ipsec-vpnd"                       # VPN服务器（与ipsec-server 二选一）
 		"luci-app-turboacc"                         # TurboACC 网络加速
 		"luci-app-vlmcsd"                           # KMS 服务器设置
 		"luci-app-webadmin"                         # Web 管理页面设置
