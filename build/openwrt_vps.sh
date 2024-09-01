@@ -139,18 +139,6 @@ rm -rf $lede_path/diy-part2.sh
 ## 修改默认IP为10.10.10.1
 
 
-# 加载diy-vps-oem.sh脚本；
-if [ -f "$project_path/DIY/diy-vps-oem.sh" ];then  # 如果本地不存在，就在线下载；
-	print_green "***使用本地diy-vps-oem.sh***"
-else
-	print_yellow "***下载diy-vps-oem.sh***"
-	curl -L https://raw.githubusercontent.com/$CangKu/$REPO_MAIN/build/DIY/diy-vps-oem.sh -o $project_path/DIY/diy-vps-oem.sh	## 下载diy-vps-oem.sh
-fi
-cp -rf $project_path/DIY/diy-vps-oem.sh $lede_path/diy-vps-oem.sh   ## 复制到Lede源码目录内
-bash $lede_path/diy-vps-oem.sh                                      ## Lede源码目录内执行
-rm -rf $lede_path/diy-vps-oem.sh
-
-
 # 加载机型配置configs目录；
 if [ -d "$project_path/DIY/configs" ];then         # 如果本地不存在，就在线下载；
 	print_green "***使用本地configs机型目录***"
@@ -170,6 +158,18 @@ else
 fi
 rm -f $lede_path/.config                            ## 先删除源码内默认的.config插件配置文件；
 cp -fv $project_path/DIY/.config $lede_path         ## 复制本地 DIY/.config插件配置文件至lede目录下；
+
+
+# 加载diy-vps-oem.sh脚本；
+if [ -f "$project_path/DIY/diy-vps-oem.sh" ];then  # 如果本地不存在，就在线下载；
+	print_green "***使用本地diy-vps-oem.sh***"
+else
+	print_yellow "***下载diy-vps-oem.sh***"
+	curl -L https://raw.githubusercontent.com/$CangKu/$REPO_MAIN/build/DIY/diy-vps-oem.sh -o $project_path/DIY/diy-vps-oem.sh	## 下载diy-vps-oem.sh
+fi
+cp -rf $project_path/DIY/diy-vps-oem.sh $lede_path/diy-vps-oem.sh   ## 复制到Lede源码目录内
+bash $lede_path/diy-vps-oem.sh                                      ## Lede源码目录内执行
+rm -rf $lede_path/diy-vps-oem.sh
 
 
 cd $project_path                                                                    ## 进入仓库项目的主目录内

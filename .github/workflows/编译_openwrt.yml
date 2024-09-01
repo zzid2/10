@@ -33,16 +33,16 @@ on:
   # repository_dispatch:                                 ## 接收外部事件触发，“源码更新_定时校验”运行后触发编译。
   
   
-  ## 对齐符号
+  ## 对齐符号“#”
   # schedule:                        ## 定时触发开始编译(时间设置请看定时编译说明)
     # - cron: 30 8 */5 * *           ## 每间隔5天，在早上8.30执行
   
   
-  ## 对齐符号
+  ## 对齐符号“#”
   # watch:                           ## 点☆Star触发开始编译
     # types: started
 
-  ## 对齐符号
+  ## 对齐符号“#”
   push:                             ## 当代码推送到指定分支时      触发编译
     branches:
       - main                        ## 确保只在 main 分支有改动时，触发编译
@@ -50,7 +50,7 @@ on:
       - '.github/workflows/编译_openwrt.yml'               ## 只在这个文件有变化时 触发编译
       
       
-  ## 对齐符号
+  ## 对齐符号“#”
   # release:                         ## release发布触发开始编译(只是一个触发条件,不会发布的,又麻烦,没卵用,不用研究)
     # types: published
 
@@ -796,6 +796,8 @@ jobs:
         echo "$(date +%s)" > end_time.txt                   ## 结束时间 写入到“end_time.txt”文本中（与开头“start_time.txt”文本对应）
         ELAPSED_MINUTES=$(awk -v start=$(cat start_time.txt) -v end=$(cat end_time.txt) 'BEGIN { elapsed = end - start; printf "%.2f", elapsed / 60 }')         ## = ELAPSED_MINUTES变量：计算运行时间，并保留两位小数点和保留前面有0
         echo "ELAPSED_MINUTES=$ELAPSED_MINUTES" >> $GITHUB_ENV                                                                                                  ## 总运行时间（分钟）写入变量： ELAPSED_MINUTES    ELAPSED_TIME
+        rm -rf {start_time.txt,end_time.txt}
+        echo "总运行时间为 ${{ env.ELAPSED_MINUTES }} 分钟"
         
         
         

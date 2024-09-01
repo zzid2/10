@@ -57,13 +57,13 @@ sed -i '$a src-git luciapp https://github.com/zzid2/luci-app' feeds.conf.default
 #---------------------------------------------------------------------------------------------------------------------------------------
 
 
-cd $lede_path   #---删除 LEDE源码内 lede/feeds/luci/applications/* 自带插件
+cd $lede_path   #---保留 LEDE源码内 lede/feeds/luci/applications/* 自带插件
 if [ -d "$lede_path/feeds/luci/applications" ]; then                                           # 如果存在，只保留以下插件，其他插件全部删除；
 	print_error "***删除插件***   lede/feeds/luci/applications/*** "
 	cd $lede_path/feeds/luci/applications                                                      # 进入 LEDE源码内applications目录内；
 	mkdir -p app && find . -mindepth 1 -maxdepth 1 ! -name app -exec mv {} app/ \;             # 创建 临时“app”目录，移动当前所有目录 到“app”目录内，后续会删除“app”目录；
 	
-	# 定义遍历目录为：applications
+	# 保留插件 定义遍历的目录：applications
 	applications=(
 		"luci-app-samba4"                           # 网络共享
 		"luci-app-firewall"                         # 防火墙
@@ -96,7 +96,7 @@ if [ -d "$lede_path/feeds/luci/themes" ]; then                                  
 	print_error "***删除插件***   lede/luci/themes/*** "
 	cd $lede_path/feeds/luci/themes                                                            # 进入themes主题目录
 	
-	# 定义遍历目录为：themes
+	# 删除插件 定义遍历的目录：themes
 	themes=(
 		"luci-theme-argon"                          # 删除Argon主题（旧版必删）
 		"luci-theme-argon-mod"                      # 删除Argon主题
@@ -121,7 +121,7 @@ if [ -d "$lede_path/feeds/luciapp" ];then                                       
 	print_error "***删除插件***   lede/feeds/luciapp/***（自己整理的源） "
 	cd $lede_path/feeds/luciapp
 
-	# 定义遍历目录为：luciapp
+	# 删除插件 定义遍历的目录：luciapp
 	luciapp=(
 		".git"                                      # 删除多余的git目录
 	)
@@ -138,13 +138,13 @@ fi
 #---------------------------------------------------------------------------------------------------------------------------------------
 
 
-cd $lede_path   #---删除 kenzok8目录内插件 lede/feeds/kenzok8/*
+cd $lede_path   #---保留 kenzok8目录内插件 lede/feeds/kenzok8/*
 if [ -d "$lede_path/feeds/kenzok8" ];then                                                     # 如果存在，就删除以下插件目录
 	print_error "***删除插件***   lede/feeds/kenzok8/*** "
 	cd $lede_path/feeds/kenzok8
 	mkdir -p app && find . -mindepth 1 -maxdepth 1 ! -name app -exec mv {} app/ \;            # 临时创建app文件夹，移动当前全部文件到app目录内，后续会删除；
 	
-	# 定义遍历目录为：kenzok8
+	# 保留插件 定义遍历的目录：kenzok8
 	kenzok8=(
 		"luci-app-samba4"                           # 网络共享（必备插件）
 	)
