@@ -99,7 +99,7 @@ else
 fi
 
 
-# 复制本地img背景图片；
+# 加载本地“img”背景图片；
 if [ -d "$project_path/DIY/img" ];then
 	print_green "***使用本地img背景图片***"
 else
