@@ -168,6 +168,7 @@ else
 	curl -L https://raw.githubusercontent.com/$CangKu/$REPO_MAIN/build/DIY/diy-vps-oem.sh -o $project_path/DIY/diy-vps-oem.sh	## 下载diy-vps-oem.sh
 fi
 cp -rf $project_path/DIY/diy-vps-oem.sh $lede_path/diy-vps-oem.sh   ## 复制到Lede源码目录内
+cd $lede_path
 bash $lede_path/diy-vps-oem.sh                                      ## Lede源码目录内执行
 rm -rf $lede_path/diy-vps-oem.sh
 
