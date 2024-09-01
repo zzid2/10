@@ -18,7 +18,7 @@ print_yellow() {                          ## 打印黄色字体
 
 
 print_yellow "正在执行diy-vps-oem.sh脚本......"
-pwd && ls
+
 sed -i '/CONFIG_PACKAGE_luci-app-samba4=y/d' .config                ## 编译菜单取消 luci-app-samba4配置
 sed -i 's/CONFIG_PACKAGE_luci-app-samba4=y/CONFIG_PACKAGE_luci-app-samba4=n/' .config
 
