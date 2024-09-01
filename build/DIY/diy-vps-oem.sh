@@ -20,11 +20,10 @@ print_yellow() {                          ## 打印黄色字体
 print_yellow "正在执行diy-vps-oem.sh脚本......"
 
 
-#   取消 编译菜单插件
-sed -i '/CONFIG_PACKAGE_autosamba=y/d' .config                      ## 取消 autosamba
-sed -i '/CONFIG_PACKAGE_luci-app-samba4=y/d' .config                ## 取消 luci-app-samba4
+#   取消 默认编译插件
+echo "CONFIG_PACKAGE_autosamba=n" >> .config                        ## 取消   Extra packages ---> autosamba
+echo "CONFIG_PACKAGE_luci-app-samba4=n" >> .config                  ## 取消   luci-app-samba4
 
-# sed -i 's/CONFIG_PACKAGE_luci-app-samba4=y/CONFIG_PACKAGE_luci-app-samba4=n/' .config
+# sed -i '/CONFIG_PACKAGE_autosamba=y/d' .config                      ## 删除 autosamba
+# sed -i '/CONFIG_PACKAGE_luci-app-samba4=y/d' .config                ## 删除 luci-app-samba4
 
-
-# echo "CONFIG_PACKAGE_luci-app-samba4=n" >> .config            # 设置为不编译
