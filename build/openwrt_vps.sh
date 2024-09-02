@@ -91,12 +91,44 @@ else
     print_yellow "***下载Lean大源码***"
     git clone --depth 1 $REPO_URL $lede_path
     if [ $? -eq 0 ]; then
-        print_green "***lede源码下载完成***"
+		print_green "***lede源码下载完成***"
     else
         print_error "***lede源码下载失败***"
-        exit 1      # 异常退出
+        if [ -f "./lede.tar.gz" ];then                                          ## 判断本地压缩包
+			print_green "***解压本地 dl.tar.gz 压缩包***"
+			tar -xzvf lede.tar.gz -C .
+		else
+			if ping -c 1 -W 1 10.10.10.10 &> /dev/null; then
+				print_green "局域网环境,***使用链接1 下载 dl.tar.gz 压缩包***"
+				wget -P $lede_path http://10.10.10.16:21704/api/public/dl/GhWWQ_HT/dl.tar.gz
+			else
+				print_green "非局域网环境,***使用链接1 下载 dl.tar.gz 压缩包***"
+				wget -P $lede_path http://42.225.30.171:21704/api/public/dl/GhWWQ_HT/dl.tar.gz
+				if [ $? -eq 0 ]; then
+					print_green "***lede源码下载完成***"
+				else
+					print_error "***lede源码下载失败，退出脚本***"
+					exit 1      # 异常退出
+				fi
+			fi
+		fi
     fi
 fi
+
+
+# if [ -d "$lede_path" ]; then         # 如果本地不存在，就在线下载
+    # print_green " ***退出脚本：请执行“make.sh”进行二次编译！！！*** "
+    # exit 0           # Lean目录已存在，正常退出
+# else
+    # print_yellow "***下载Lean大源码***"
+    # git clone --depth 1 $REPO_URL $lede_path
+    # if [ $? -eq 0 ]; then
+        # print_green "***lede源码下载完成***"
+    # else
+        # print_error "***lede源码下载失败***"
+        # exit 1      # 异常退出
+    # fi
+# fi
 
 
 # 加载本地“img”背景图片；
