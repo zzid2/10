@@ -95,12 +95,11 @@ else
     else
         print_error "***lede源码下载失败***"
         if [ -f "./lede.tar.gz" ];then                                          ## 判断本地压缩包
-			print_green "***解压本地 lede.tar.gz 压缩包***"
-			tar -xzvf lede.tar.gz -C ./                                         ## 解压到当前目录
+			print_green "***使用本地 lede.tar.gz 压缩包***"
 		else
 			if ping -c 1 -W 1 10.10.10.18 &> /dev/null; then
 				print_green "局域网环境,***使用链接1 下载 lede.tar.gz 压缩包***"
-				wget -P $lede_path http://10.10.10.16:21704/api/public/dl/L0W9KnZG/lede.tar.gz
+				wget -P $project_path http://10.10.10.16:21704/api/public/dl/L0W9KnZG/lede.tar.gz
 				if [ $? -eq 0 ]; then
 					print_green "***lede源码下载完成***"
 				else
@@ -109,8 +108,7 @@ else
 				fi
 			else
 				print_green "非局域网环境,***使用链接2 下载 lede.tar.gz 压缩包***"
-				pwd && ls
-				wget -P $lede_path http://42.225.29.104:21704/api/public/dl/L0W9KnZG/lede.tar.gz
+				wget -P $project_path http://42.225.29.104:21704/api/public/dl/L0W9KnZG/lede.tar.gz
 				if [ $? -eq 0 ]; then
 					print_green "***lede源码下载完成***"
 				else
@@ -118,9 +116,9 @@ else
 					exit 1      # 异常退出
 				fi
 			fi
-			print_green "***解压本地 lede.tar.gz 压缩包***"
-			tar -xzvf lede.tar.gz -C ./                                         ## 解压到当前目录
 		fi
+		print_green "***解压本地 lede.tar.gz 压缩包***"
+		tar -xzf lede.tar.gz -C $project_path                                         ## 解压到当前目录
     fi
 fi
 
