@@ -109,6 +109,7 @@ else
 				fi
 			else
 				print_green "非局域网环境,***使用链接2 下载 lede.tar.gz 压缩包***"
+				pwd && ls
 				wget -P $lede_path http://42.225.29.104:21704/api/public/dl/L0W9KnZG/lede.tar.gz
 				if [ $? -eq 0 ]; then
 					print_green "***lede源码下载完成***"
