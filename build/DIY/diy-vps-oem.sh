@@ -43,9 +43,14 @@ echo "CONFIG_PACKAGE_luci-app-turboacc=n" >> .config                ## 取消   
 sed -i '/CONFIG_PACKAGE_luci-app-vlmcsd=y/d' .config
 echo "CONFIG_PACKAGE_luci-app-vlmcsd=n" >> .config                  ## 取消   KMS激活服务Windows
 
+sed -i '/CONFIG_PACKAGE_luci-app-webadmin=y/d' .config
+echo "CONFIG_PACKAGE_luci-app-webadmin=n" >> .config
+
 sed -i '/CONFIG_PACKAGE_luci-app-wol=y/d' .config
 echo "CONFIG_PACKAGE_luci-app-wol=n" >> .config                     ## 取消   WOL网络唤醒
 
+sed -i '/CONFIG_PACKAGE_luci-app-zerotier=y/d' .config
+echo "CONFIG_PACKAGE_luci-app-zerotier=n" >> .config
 
 
 

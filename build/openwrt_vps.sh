@@ -197,7 +197,7 @@ fi
 cp -rf $project_path/DIY/diy-vps-oem.sh $lede_path/diy-vps-oem.sh   ## 复制到Lede源码目录内
 cd $lede_path
 bash $lede_path/diy-vps-oem.sh                                      ## Lede源码目录内执行
-rm -rf $lede_path/diy-vps-oem.sh
+# rm -rf $lede_path/diy-vps-oem.sh
 
 
 cd $project_path                                                                    ## 进入仓库项目的主目录内
