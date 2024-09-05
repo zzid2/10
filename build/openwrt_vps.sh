@@ -118,7 +118,7 @@ else
 			fi
 		fi
 		print_green "***解压本地 lede.tar.gz 压缩包***"
-		tar -xzf lede.tar.gz -C $project_path                                         ## 解压到当前目录
+		tar -xzf lede.tar.gz -C $project_path                                   ## 解压到当前目录
     fi
 fi
 
