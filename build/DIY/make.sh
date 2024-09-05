@@ -44,7 +44,8 @@ cd $lede_path                                               ## 进入Lede源码�
 }
 
 
-
+ sed -i '/CONFIG_PACKAGE_luci-app-autoreboot=y/d' .config            ## 删除   计划定时重启（autopoweroff二选一）
+ echo "CONFIG_PACKAGE_luci-app-autoreboot=n" >> .config              ## 取消   计划定时重启（autopoweroff二选一）
 #---------------------------------------------------------------------------------------------------------------------------------------
 function x86_64 {             ## x86_64
  cat configs/x86_64.config > .config && makes
@@ -62,8 +63,7 @@ function x86_64Lite {         ## x86_64精简版，单独执行命令！
  break
 }
 
- sed -i '/CONFIG_PACKAGE_luci-app-autoreboot=y/d' .config            ## 删除   计划定时重启（autopoweroff二选一）
- echo "CONFIG_PACKAGE_luci-app-autoreboot=n" >> .config              ## 取消   计划定时重启（autopoweroff二选一）
+
 function Raspberry4 {        ## 树莓派 4
  cat configs/RPi4.config > .config && makes
 }
