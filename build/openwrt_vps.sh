@@ -121,22 +121,7 @@ else
 		tar -xzf lede.tar.gz -C $project_path                                   ## 解压到当前目录
     fi
 fi
-
-# tar -czvf lede.tar.gz lede                ## 打包当前lede文件夹为压缩包命令；
-
-# if [ -d "$lede_path" ]; then         # 如果本地不存在，就在线下载
-    # print_green " ***退出脚本：请执行“make.sh”进行二次编译！！！*** "
-    # exit 0           # Lean目录已存在，正常退出
-# else
-    # print_yellow "***下载Lean大源码***"
-    # git clone --depth 1 $REPO_URL $lede_path
-    # if [ $? -eq 0 ]; then
-        # print_green "***lede源码下载完成***"
-    # else
-        # print_error "***lede源码下载失败***"
-        # exit 1      # 异常退出
-    # fi
-# fi
+# tar -czvf lede.tar.gz lede                                                    ## 打包当前lede文件夹为压缩包命令；
 
 
 # 加载本地“img”背景图片；
