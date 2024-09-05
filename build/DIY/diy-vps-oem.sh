@@ -27,11 +27,23 @@ echo "CONFIG_PACKAGE_luci-app-samba4=n" >> .config                  ## 取消   
 # sed -i '/CONFIG_PACKAGE_autosamba=y/d' .config                      ## 删除 autosamba
 # sed -i '/CONFIG_PACKAGE_luci-app-samba4=y/d' .config                ## 删除 luci-app-samba4
 
-echo "CONFIG_PACKAGE_luci-app-autoreboot=n" >> .config              ## 取消   luci-app-samba4
+
+sed -i '/CONFIG_PACKAGE_luci-app-autoreboot=y/d' .config            ## 删除   计划定时重启（autopoweroff二选一）
+echo "CONFIG_PACKAGE_luci-app-autoreboot=n" >> .config              ## 取消   计划定时重启（autopoweroff二选一）
+
+sed -i '/CONFIG_PACKAGE_luci-app-filetransfer=y/d' .config
 echo "CONFIG_PACKAGE_luci-app-filetransfer=n" >> .config            ## 取消   文件传输（可web安装ipk包）
+
+sed -i '/CONFIG_PACKAGE_luci-app-ssr-plus=y/d' .config
 echo "CONFIG_PACKAGE_luci-app-ssr-plus=n" >> .config                ## 取消   SSR-plus
+
+sed -i '/CONFIG_PACKAGE_luci-app-turboacc=y/d' .config
 echo "CONFIG_PACKAGE_luci-app-turboacc=n" >> .config                ## 取消   TurboACC网络加速
+
+sed -i '/CONFIG_PACKAGE_luci-app-vlmcsd=y/d' .config
 echo "CONFIG_PACKAGE_luci-app-vlmcsd=n" >> .config                  ## 取消   KMS激活服务Windows
+
+sed -i '/CONFIG_PACKAGE_luci-app-wol=y/d' .config
 echo "CONFIG_PACKAGE_luci-app-wol=n" >> .config                     ## 取消   WOL网络唤醒
 
 
