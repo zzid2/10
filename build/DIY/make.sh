@@ -62,7 +62,8 @@ function x86_64Lite {         ## x86_64精简版，单独执行命令！
  break
 }
 
-
+ sed -i '/CONFIG_PACKAGE_luci-app-autoreboot=y/d' .config            ## 删除   计划定时重启（autopoweroff二选一）
+ echo "CONFIG_PACKAGE_luci-app-autoreboot=n" >> .config              ## 取消   计划定时重启（autopoweroff二选一）
 function Raspberry4 {        ## 树莓派 4
  cat configs/RPi4.config > .config && makes
 }
@@ -97,8 +98,6 @@ function compileUp {         ## 使用当前.config配置进行编译，单独�
 
 
 function openMenu {          ## 打开Make编译菜单
- sed -i '/CONFIG_PACKAGE_luci-app-autoreboot=y/d' .config            ## 删除   计划定时重启（autopoweroff二选一）
- echo "CONFIG_PACKAGE_luci-app-autoreboot=n" >> .config              ## 取消   计划定时重启（autopoweroff二选一）
  make defconfig && make menuconfig
  break
 }
