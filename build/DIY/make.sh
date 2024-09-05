@@ -19,8 +19,7 @@ print_yellow() {                          ## 打印黄色字体
     echo -e "\033[33m$1\033[0m"
 }
 
-sed -i '/CONFIG_PACKAGE_luci-app-autoreboot=y/d' .config            ## 删除   计划定时重启（autopoweroff二选一）
-echo "CONFIG_PACKAGE_luci-app-autoreboot=n" >> .config              ## 取消   计划定时重启（autopoweroff二选一）
+
 # 更新源码
 function updatesource {
  print_yellow "====== 更新源码以及组件 ======"
@@ -98,6 +97,8 @@ function compileUp {         ## 使用当前.config配置进行编译，单独�
 
 
 function openMenu {          ## 打开Make编译菜单
+ sed -i '/CONFIG_PACKAGE_luci-app-autoreboot=y/d' .config            ## 删除   计划定时重启（autopoweroff二选一）
+ echo "CONFIG_PACKAGE_luci-app-autoreboot=n" >> .config              ## 取消   计划定时重启（autopoweroff二选一）
  make defconfig && make menuconfig
  break
 }
