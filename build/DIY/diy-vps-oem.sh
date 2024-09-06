@@ -30,7 +30,7 @@ echo "CONFIG_PACKAGE_luci-app-samba4=n" >> .config                  ## 取消   
 
 
 sed -i '/CONFIG_PACKAGE_luci-app-autoreboot=y/d' .config            ## 删除   计划定时重启（autopoweroff二选一）
-# echo "CONFIG_PACKAGE_luci-app-autoreboot=n" >> .config              ## 取消   计划定时重启（autopoweroff二选一）
+echo "CONFIG_PACKAGE_luci-app-autoreboot=n" >> .config              ## 取消   计划定时重启（autopoweroff二选一）
 
 
 sed -i '/CONFIG_PACKAGE_luci-app-filetransfer=y/d' .config
