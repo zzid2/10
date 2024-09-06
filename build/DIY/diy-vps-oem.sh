@@ -21,11 +21,12 @@ print_yellow "正在执行diy-vps-oem.sh脚本......"
 
 
 #   取消 默认编译插件
-echo "CONFIG_PACKAGE_autosamba=n" >> .config                        ## 取消   Extra packages ---> autosamba
-echo "CONFIG_PACKAGE_luci-app-samba4=n" >> .config                  ## 取消   luci-app-samba4
 
 # sed -i '/CONFIG_PACKAGE_autosamba=y/d' .config                      ## 删除 autosamba
+echo "CONFIG_PACKAGE_autosamba=n" >> .config                        ## 取消   Extra packages ---> autosamba
+
 # sed -i '/CONFIG_PACKAGE_luci-app-samba4=y/d' .config                ## 删除 luci-app-samba4
+echo "CONFIG_PACKAGE_luci-app-samba4=n" >> .config                  ## 取消   luci-app-samba4
 
 
 # sed -i '/CONFIG_PACKAGE_luci-app-autoreboot=y/d' .config            ## 删除   计划定时重启（autopoweroff二选一）
