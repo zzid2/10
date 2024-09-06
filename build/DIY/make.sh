@@ -29,11 +29,11 @@ function updatesource {
  ./scripts/feeds install -a
 
 
-# 更新App插件（package/otherapp目录内的插件）
- folder="$lede_path/package/otherapp"                       ## 目录变量=Openwrt-main/package/otherapp目录
- softfiles=$(ls $folder)                                    ## 目录变量=列出otherapp目录列表
+# 目录路径变量
+ folder="$lede_path/package/otherapp"                       ## 变量 folder    = Openwrt-main/package/otherapp目录
+ softfiles=$(ls $folder)                                    ## 变量 softfiles = 列出otherapp目录列表
 
-# 更新appsname目录下的插件
+# 更新otherapp目录下的插件
  print_yellow "========== 开始检查更新app源码 =========="
  for sfile in ${softfiles}
  do 
@@ -52,7 +52,7 @@ function x86_64 {             ## x86_64
 
 function x86_64Lite {         ## x86_64精简版，单独执行命令！
  cat configs/x86_64Lite.config > .config
- cat configs/LuciApp_Lite.config >> .config
+ cat configs/App_Lite.config >> .config
  make defconfig
  down_dl             ## 下载DL库压缩包（外网用不到！）
  print_yellow "CPU线程数：$(($(nproc)+1))   进行全线程编译..."
@@ -106,7 +106,7 @@ function cleanCache {        ## 清除编译缓存
 
 
 function makes {             ## 通用配置（自定义插件）
- cat configs/LuciApp.config >> .config && make defconfig
+ cat configs/App.config >> .config && make defconfig
  down_dl             ## 下载DL库压缩包（外网用不到！）
  print_yellow "CPU线程数：$(($(nproc)+1))   进行全线程编译..."
  make -j$(($(nproc)+1)) V=s || make -j1 V=s            ## 首选全速线程编译，如果报错 再进行单线程编译排查错误！
