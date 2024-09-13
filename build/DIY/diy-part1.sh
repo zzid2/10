@@ -67,6 +67,8 @@ if [ -d "$lede_path/feeds/luci/applications" ]; then                            
 	applications=(
 		"luci-app-samba4"                           # 网络共享
 		"luci-app-firewall"                         # 防火墙
+		"luci-app-frpc"                             # Frp客户端
+		"luci-app-frps"                             # Frp服务端
 		"luci-app-filetransfer"                     # 安装 ipk 软件包（文件传输）
 		"luci-app-ttyd"                             # 网页终端命令行
 		"luci-app-ipsec-server"                     # VPN服务器（与ipsec-vpnd   二选一）
