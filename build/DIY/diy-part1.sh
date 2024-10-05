@@ -39,7 +39,7 @@ echo "***源码自带_通信核心（src-git telephony https://git.openwrt.org/f
 # sed -i 's/^#\(.*helloworld\)/\1/' feeds.conf.default                                         # 显示源 “helloworld” 目录= luci-app-ssr-plus 插件
 # sed -i '$i '"src-git helloworld https://github.com/fw876/helloworld"'' feeds.conf.default    # 添加源 “helloworld” 目录= luci-app-ssr-plus 插件
 
-sed -i '$a src-git luciapp https://github.com/zzid2/luci-app' feeds.conf.default            # 自己整理的源       $a= 插入最后一行， $i= 插入倒数第二行
+## sed -i '$a src-git luciapp https://github.com/zzid2/luci-app' feeds.conf.default            # 自己整理的源       $a= 插入最后一行， $i= 插入倒数第二行
 # sed -i '$a src-git kenzok8 https://github.com/kenzok8/openwrt-packages' >>feeds.conf.default # 插件源码
 # sed -i '$a src-git smpackage https://github.com/kenzok8/small-package' feeds.conf.default    # 整合插件源码（追新常用！）
 # echo 'src-git small https://github.com/kenzok8/small' >>feeds.conf.default				   # 保留：luci-app-bypass  luci-app-mosdns  luci-app-passwall  luci-app-passwall2  luci-app-ssr-plus（新版本：passwall  passwall 2   SSR_Plus）
